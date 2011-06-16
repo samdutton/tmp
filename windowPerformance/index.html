@@ -13,6 +13,10 @@
 
 function Timeline(events) {
 	this.events = events;
+    
+    this.borderColor = "#aaa";
+    this.eventMargin = 5;
+    this.eventPadding = 5;
 }
 
 Timeline.prototype = {
@@ -26,20 +30,62 @@ Timeline.prototype = {
 	// create x -axis
 
 	draw: function() {
-		this.events.forEach(function(event){
-			console.log(event.label);
+		for (var i = 0; i != this.events.length; ++i) {
 			var eventDiv = $("<div class='event' />");
-			eventDiv.append(event.label);
+			eventDiv.append(this.events[i].label);
+            eventDiv.css({
+                "border-left": "1px solid " + this.borderColor,
+                "margin-bottom": this.eventMargin + "px",
+                "padding-left": this.eventPadding + "px"
+            });
 			$("#timeline").append(eventDiv);
-		});
+		};
 	}
 };
 
 $(document).ready(function() {
-	var events = [
-		{time: 0, label: "My event foo"}, 
-		{time: 10, label: "Another event"}, 
-		{time: 20, label: "An event with a long name"}];
+
+	var events = []; // navigation or load events
+	var notApplicable = []; // navigation or load events with zero time
+	// for each attribute in performance.timing
+	// create an object and add it to the events array
+	var minTime = Number.MAX_VALUE;
+	var maxTime = Number.MIN_VALUE;
+	Object.keys(performance.timing).forEach(function(key){	
+		var time = parseInt(performance.timing[key]);
+		if (time === 0) {
+			notApplicable.push(key);
+		} else {
+			var event = {};
+			event["attribute"] = key;
+			if (time > maxTime) {
+				maxTime = time;
+			}
+			if (time < minTime) {
+				minTime = time;
+			}
+			event["time"] = time;
+			events.push(event);
+		}
+	})	
+	
+	// subtract minTime from each event time
+	// so that the earliest event time is 0
+	events.forEach(function(event){
+		event.time -= minTime;
+	});
+ 
+	// sort the events array by time
+	events.sort(function(a, b){return a.time - b.time});
+	var arrayToPrint = [];
+	events.forEach(function(event){
+			arrayToPrint.push(event.time + ": " + event.attribute);
+	});
+	document.body.innerHTML += arrayToPrint.join("<br />") + "<br />";
+	document.body.innerHTML += "Total elapsed: " + (maxTime - minTime) + "<br />";
+	document.body.innerHTML += "Not applicable: " + notApplicable.join(", ");
+
+
 	var timeline = new Timeline(events);
 	timeline.draw();
 });
