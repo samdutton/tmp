@@ -24,18 +24,25 @@ Timeline.prototype = {
 	// - eventDiv.top = index * vFactor;
 	
 	// create x -axis
+
 	draw: function() {
-		events.forEach(function(){
-		
+		this.events.forEach(function(event){
+			console.log(event.label);
+			var eventDiv = $("<div class='event' />");
+			eventDiv.append(event.label);
+			$("#timeline").append(eventDiv);
 		});
-		alert(this.events);
 	}
 };
 
-
-var events = [{0: "My event foo"}, {10: "Another event"}, {20: "An event with a long name"}];
-var timeline = new Timeline(events);
-timeline.draw();
+$(document).ready(function() {
+	var events = [
+		{time: 0, label: "My event foo"}, 
+		{time: 10, label: "Another event"}, 
+		{time: 20, label: "An event with a long name"}];
+	var timeline = new Timeline(events);
+	timeline.draw();
+});
 
 </script>
 
@@ -46,6 +53,8 @@ timeline.draw();
 </head>
 
 <body>
+
+<div id="timeline" />
 
 </body>
 
