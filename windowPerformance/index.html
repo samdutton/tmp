@@ -44,21 +44,31 @@ Timeline.prototype = {
 };
 
 $(document).ready(function() {
-
-	var events = []; // navigation or load events
-	var notApplicable = []; // navigation or load events with zero time
+    // array of navigation or load events
+    // each object in the array has a time property 
+    // and events property: an array of event names
+	var times = []; 
+	var didntHappen = []; // names of navigation or load events that did not occur
 	// for each attribute in performance.timing
 	// create an object and add it to the events array
 	var minTime = Number.MAX_VALUE;
 	var maxTime = Number.MIN_VALUE;
-	Object.keys(performance.timing).forEach(function(key){	
-		var time = parseInt(performance.timing[key]);
-		if (time === 0) {
-			notApplicable.push(key);
+    // performance.timing properties are not enumerable in IE 9.0 so Object.keys() won't work
+	for (eventName in performance.timing) {	
+		var time = parseInt(performance.timing[eventName]);
+		if (time === 0) {  // events that did not occur have zero time
+			didntHappen.push(eventName);
 		} else {
-			var event = {};
-			event["attribute"] = key;
-			if (time > maxTime) {
+        
+        
+        if (attributesByTime.hasOwnProperty(time)) { // if another attribute has the same time
+			attributesByTime[time] += ", " + key; // add the name of this one after a comma
+		} else {
+			attributesByTime[time] = key;
+		}
+        
+			var time = {};
+			if (time > maxTime) { // work out the earliest and latest event times
 				maxTime = time;
 			}
 			if (time < minTime) {
@@ -70,18 +80,19 @@ $(document).ready(function() {
 	})	
 	
 	// subtract minTime from each event time
-	// so that the earliest event time is 0
-	events.forEach(function(event){
-		event.time -= minTime;
-	});
+	// so that the earliest event time is zero
+	for (var i = 0; i != events.length; ++i) {
+		events[i].time -= minTime;
+	};
  
 	// sort the events array by time
 	events.sort(function(a, b){return a.time - b.time});
-	var arrayToPrint = [];
+	var eventsSortedByTime = [];
+    for 
 	events.forEach(function(event){
-			arrayToPrint.push(event.time + ": " + event.attribute);
+			eventsSortedByTime.push(event.time + ": " + event.attribute);
 	});
-	document.body.innerHTML += arrayToPrint.join("<br />") + "<br />";
+	document.body.innerHTML += eventsSortedByTime.join("<br />") + "<br />";
 	document.body.innerHTML += "Total elapsed: " + (maxTime - minTime) + "<br />";
 	document.body.innerHTML += "Not applicable: " + notApplicable.join(", ");
 
