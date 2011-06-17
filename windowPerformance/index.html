@@ -11,6 +11,7 @@
 
 <script type="text/javascript">
 
+// Class for simple timelines like this:
 function Timeline(events) {
 	this.events = events;
     
@@ -20,12 +21,7 @@ function Timeline(events) {
 }
 
 Timeline.prototype = {
-	// for each event in events
-	// create an eventDiv:
-	// - innerHTML = event.value;
 	// - eventDiv.left = event.time * hFactor;
-	// - eventDiv.css
-	// - eventDiv.top = index * vFactor;
 	
 	// create x -axis
 
@@ -44,62 +40,57 @@ Timeline.prototype = {
 };
 
 $(document).ready(function() {
-    // array of navigation or load events
-    // each object in the array has a time property 
-    // and events property: an array of event names
-	var times = []; 
-	var didntHappen = []; // names of navigation or load events that did not occur
-	// for each attribute in performance.timing
-	// create an object and add it to the events array
+
+	// get the earliest and latest event times    
+	// would be better if possible not to iterate twice through performance.timing!
 	var minTime = Number.MAX_VALUE;
 	var maxTime = Number.MIN_VALUE;
-    // performance.timing properties are not enumerable in IE 9.0 so Object.keys() won't work
-	for (eventName in performance.timing) {	
+	for (eventName in performance.timing) {
 		var time = parseInt(performance.timing[eventName]);
-		if (time === 0) {  // events that did not occur have zero time
-			didntHappen.push(eventName);
-		} else {
-        
-        
-        if (attributesByTime.hasOwnProperty(time)) { // if another attribute has the same time
-			attributesByTime[time] += ", " + key; // add the name of this one after a comma
-		} else {
-			attributesByTime[time] = key;
+		if (time > maxTime) { 
+			maxTime = time;
 		}
-        
-			var time = {};
-			if (time > maxTime) { // work out the earliest and latest event times
-				maxTime = time;
-			}
-			if (time < minTime) {
-				minTime = time;
-			}
-			event["time"] = time;
-			events.push(event);
+		// performance.timing events that did not occur have zero time
+		// e.g. secureConnectionStart or redirectStart
+		if (time !== 0 && time < minTime) { 
+			minTime = time;
 		}
-	})	
+	}
 	
-	// subtract minTime from each event time
-	// so that the earliest event time is zero
-	for (var i = 0; i != events.length; ++i) {
-		events[i].time -= minTime;
-	};
+	console.log("minTime: " + minTime);
+
+	var attributesByTime = {}; 
+	// attributesByTime consists of arrays of performance.timing  
+	// attributes (event names) keyed by time
+	// -- note that there may be more than one event for each time
+	var didntHappen = []; // names of possible events that did not occur
+	// get the time of each attribute (event) in performance.timing
+    // -- note that performance.timing properties are not enumerable in IE 9.0
+    // so Object.keys() won't work
+	for (eventName in performance.timing) {	
+		var time = parseInt(performance.timing[eventName]); 
+		// performance.timing events that did not occur have zero time
+		// e.g. secureConnectionStart or redirectStart
+		if (time === 0) {  
+			didntHappen.push(eventName);
+		} else { 
+			// begin event times from zero
+			var normalisedTime = time - minTime;
+			// add event name to the array of event names for the current time
+			if (attributesByTime[normalisedTime]) {
+				attributesByTime[normalisedTime].push(eventName)
+			} else {
+				attributesByTime[normalisedTime] = [normalisedTime];
+			}
+		}
+	}	
+	
+	console.log(attributesByTime);
+	console.log(didntHappen);
  
-	// sort the events array by time
-	events.sort(function(a, b){return a.time - b.time});
-	var eventsSortedByTime = [];
-    for 
-	events.forEach(function(event){
-			eventsSortedByTime.push(event.time + ": " + event.attribute);
-	});
-	document.body.innerHTML += eventsSortedByTime.join("<br />") + "<br />";
-	document.body.innerHTML += "Total elapsed: " + (maxTime - minTime) + "<br />";
-	document.body.innerHTML += "Not applicable: " + notApplicable.join(", ");
-
-
 	var timeline = new Timeline(events);
 	timeline.draw();
-});
+}); // document.ready
 
 </script>
 
