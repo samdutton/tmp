@@ -95,16 +95,23 @@ function Timeline(timelineElement, events) {
     // flag: to combine events with the same time in the same div
     this.combineEvents = true;
 
+	// defaults for timeline
+	this.numTicks = 5; // number of ticks on x-axis
 	this.width = 800; 	
-	$(timelineElement).css({"width": this.width}); 
-	
+
+	$(timelineElement).css({
+		"padding-bottom": "10px", // above x-axis
+		"width": this.width + "px"
+		}); 	
  }
 
 Timeline.prototype = {
 	draw: function() {
-		for (var i = 0; i != this.events.length; ++i) {
+		var i;
+		// draw event divs
+		for (i = 0; i != this.events.length; ++i) {
 			var event = this.events[i];
-			var eventDiv = $("<div class='event' />");
+			var eventDiv = $("<div />");
 			eventDiv.append(event.eventName);
 			// get the offset for the event div
 			var left = (event.time / this.maxTime) * (this.width - 
@@ -122,7 +129,20 @@ Timeline.prototype = {
             });
             eventDiv.attr({"title": event.time});
 			$("#timeline").append(eventDiv);
-		};
+		};		
+		// draw timeline x-axis ticks and labels
+		var xAxisDiv = $("<div />");
+		xAxisDiv.css({
+			"border-top": "1px solid #eee", // x-axis
+			"width": this.width + "px"
+		});
+		for (i = 0; i != this.numTicks; ++i) {
+			var tickDiv = $("<div class='tick' />");
+			tickDiv.append(event.eventName);
+		} 
+		$(timeElement).append(xAxisDiv);
+		
+		
 	}
 };
 
