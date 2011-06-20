@@ -10,86 +10,126 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 
 <script type="text/javascript">
+///////// get performance.timing events
 
-// Class for simple timelines like this:
-function Timeline(events) {
-	this.events = events;
-    
-    this.borderColor = "#aaa";
-    this.eventMargin = 5;
-    this.eventPadding = 5;
+// events is an array of objects, each with a time and an event name
+// -- note that there may be more than one event for each time
+var events = []; 
+
+// names of possible events that did not occur
+var nonEvents = []; 
+
+// minTime will be used to normalise event times so they start from zero
+var minTime = Number.MAX_VALUE;
+
+// get the time value for each attribute in performance.timing
+// each attribute is the name of a navigation or page load event
+// not all of which may have occurred, for example secureConnectionStart or redirectStart
+// -- note that performance.timing properties are not enumerable in IE 9.0
+// so Object.keys() won't work here
+for (eventName in performance.timing) {	
+	var time = parseInt(performance.timing[eventName]); 
+	// events that did not occur have zero time
+	if (time === 0) {  
+		nonEvents.push(eventName);
+	} else {
+		events.push({"eventName": eventName, "time": time});
+		if (time < minTime) { 
+			minTime = time;
+		}
+	}
+}	
+
+// normalise times so they start from zero
+for (var i = 0; i != events.length; ++i) {
+	events[i].time -= minTime;
 }
 
-Timeline.prototype = {
-	// - eventDiv.left = event.time * hFactor;
-	
-	// create x -axis
+// sort events by time
+// -- note that object key enumeration does not guarantee this
+events.sort(function(a, b){return a.time - b.time});
 
+///////////////////////////////////////
+
+
+
+
+
+// Class for simple timelines like this:
+//
+//     |  eventFoo
+//       |  eventBar
+//             |  eventFooBar
+// 
+//     '               '              '
+//     0              500            1000
+// events is an array of objects, each with a time and eventName value
+// timelineElement is the element where the timeline will be displayed
+function Timeline(timelineElement, events) {
+	this.events = events;
+	this.timelineElement = timelineElement;
+	// get the minimum and maximum time values
+	this.minTime = Number.MAX_VALUE;
+	this.maxTime = Number.MIN_VALUE;
+	for (var i = 0; i != events.length; ++i) {
+		var time = events[i].time;
+		if (time > this.maxTime) {
+			this.maxTime = time;
+		}
+		if (time < this.minTime) {
+			this.minTime = time;
+		}
+	}
+	console.log(this.minTime);
+	console.log(this.maxTime);
+
+	// defaults for event name display
+	// could easily be refactored to make these values customisable
+    this.eventBorderLeftColor = "#aaa"; 
+    this.eventBorderLeftStyle = "solid"; 
+    this.eventBorderLeftWidth = 1; 
+    this.eventWidth = 150;
+    this.eventMargin = 5;
+    this.eventPadding = 5;
+
+    // flag: to combine events with the same time in the same div
+    this.combineEvents = true;
+
+	this.width = 800; 	
+	$(timelineElement).css({"width": this.width}); 
+	
+ }
+
+Timeline.prototype = {
 	draw: function() {
 		for (var i = 0; i != this.events.length; ++i) {
+			var event = this.events[i];
 			var eventDiv = $("<div class='event' />");
-			eventDiv.append(this.events[i].label);
+			eventDiv.append(event.eventName);
+			// get the offset for the event div
+			var left = (event.time / this.maxTime) * (this.width - 
+					this.eventWidth - this.eventPadding - this.eventBorderLeftWidth);
             eventDiv.css({
-                "border-left": "1px solid " + this.borderColor,
+                "border-left-color": this.eventBorderLeftColor,
+                "border-left-style": this.eventBorderLeftStyle,
+                "border-left-width": this.eventBorderLeftWidth + "px",
+                "cursor": "pointer",
+                "left": left, 
                 "margin-bottom": this.eventMargin + "px",
-                "padding-left": this.eventPadding + "px"
+                "padding-left": this.eventPadding + "px",
+                "position": "relative",
+                "width": this.eventWidth + "px"
             });
+            eventDiv.attr({"title": event.time});
 			$("#timeline").append(eventDiv);
 		};
 	}
 };
 
 $(document).ready(function() {
-
-	// get the earliest and latest event times    
-	// would be better if possible not to iterate twice through performance.timing!
-	var minTime = Number.MAX_VALUE;
-	var maxTime = Number.MIN_VALUE;
-	for (eventName in performance.timing) {
-		var time = parseInt(performance.timing[eventName]);
-		if (time > maxTime) { 
-			maxTime = time;
-		}
-		// performance.timing events that did not occur have zero time
-		// e.g. secureConnectionStart or redirectStart
-		if (time !== 0 && time < minTime) { 
-			minTime = time;
-		}
-	}
-	
-	console.log("minTime: " + minTime);
-
-	var attributesByTime = {}; 
-	// attributesByTime consists of arrays of performance.timing  
-	// attributes (event names) keyed by time
-	// -- note that there may be more than one event for each time
-	var didntHappen = []; // names of possible events that did not occur
-	// get the time of each attribute (event) in performance.timing
-    // -- note that performance.timing properties are not enumerable in IE 9.0
-    // so Object.keys() won't work
-	for (eventName in performance.timing) {	
-		var time = parseInt(performance.timing[eventName]); 
-		// performance.timing events that did not occur have zero time
-		// e.g. secureConnectionStart or redirectStart
-		if (time === 0) {  
-			didntHappen.push(eventName);
-		} else { 
-			// begin event times from zero
-			var normalisedTime = time - minTime;
-			// add event name to the array of event names for the current time
-			if (attributesByTime[normalisedTime]) {
-				attributesByTime[normalisedTime].push(eventName)
-			} else {
-				attributesByTime[normalisedTime] = [normalisedTime];
-			}
-		}
-	}	
-	
-	console.log(attributesByTime);
-	console.log(didntHappen);
- 
-	var timeline = new Timeline(events);
-	timeline.draw();
+	var timelineElement = document.querySelector("#timeline");
+	var timelineObject = new Timeline(timelineElement, events);
+	timelineObject.draw();
 }); // document.ready
 
 </script>
