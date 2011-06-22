@@ -1,0 +1,67 @@
+* email Steve Souders
+* observer effect of JavaScript performance measurement
+* John Resig on the (inn)acuracy of JavaScript Time: http://ejohn.org/blog/accuracy-of-javascript-time/
+* Developers can get accurate statistics for page load speed on client devices.
+* Network latency: responseEnd - fetchStart
+* JSON.Stringify(window.msPerformance)
+* var navStartTime = new Date(timingObj.navigationStart)
+
+User latency
+
+Using JavaScript method, there is no way to know how long it took to get the page. 
+
+<h2>What does it all mean?</h2>
+
+The API gives access to the following events:
+
+navigationStart
+unloadEventStart
+unloadEventEnd
+redirectStart
+redirectEnd
+fetchStart
+domainLookupStart
+domainLookupEnd
+connectStart
+connectEnd
+secureConnectionStart
+requestStart
+responseStart
+responseEnd
+domLoading
+domInteractive
+domContentLoadedEventStart
+domContentLoadedEventEnd
+domComplete
+loadEventStart
+loadEventEnd
+
+Descriptions of each of these events are available from the interface documentation (https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface) and Microsoft's performance.timing documentation (http://msdn.microsoft.com/en-us/library/ff975075).
+
+Internet Explorer 9 supports all these except secureConnectionStart, and in addition provides the msFirstPaint event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user': http://msdn.microsoft.com/en-us/library/ff974719.
+
+There are many useful ways to use this information, for example:
+* responseEnd - fetchStart gives an idea of network latency
+* loadEventEnd - responseEnd shows how long the page took to load 
+* loadEventEnd - navigationStart shows how long the whole process of navigation and page load took.
+
+<h2>How did I get here?</h2>
+
+There are, of course, several ways to 'open a page'. This is where the performance.navigation comes in handy. This API has just two attributes:
+* redirectCount: the number of times the document request was redirected
+* type: the navigation that lead to the page being loaded:
+** action by the user such as clicking a link or entering a URL in the browser address bar
+** page reload
+** moving back or forward through history.
+
+
+{"navigationStart":1308757300882,"unloadEventStart":1308757300882,"unloadEventEnd":1308757300882,"redirectStart":0,"redirectEnd":0,"fetchStart":1308757300885,"domainLookupStart":1308757300885,"domainLookupEnd":1308757300885,"connectStart":1308757300885,"connectEnd":1308757300885,"requestStart":1308757300886,"responseStart":1308757301490,"responseEnd":1308757301490,"domLoading":1308757301490,"domInteractive":1308757301490,"domContentLoadedEventStart":1308757301490,"domContentLoadedEventEnd":1308757301490,"domComplete":1308757301976,"loadEventStart":1308757302072,"loadEventEnd":1308757302072,"msFirstPaint":1308757301001}" 
+
+
+Note that to use the performance.timing API in Internet Explorer 9: 
+- on a web page, use the <!doctype html> directive to ensure the document is displayed in Internet Explorer 9 mode: http://msdn.microsoft.com/en-us/library/cc288325
+- if using the Internet Explorer 9 developer tools console, you may need to adjust the browser or document mode
+
+
+http://blogs.msdn.com/b/ie/archive/2010/06/28/measuring-web-page-performance.aspx
+

@@ -63,8 +63,8 @@ events.sort(function(a, b){return a.time - b.time});
 // 
 //     '               '              '
 //     0              500            1000
-// events is an array of objects, each with a time and eventName value
-// timelineElement is the element where the timeline will be displayed
+// events is an array of objects that each have a time and eventName property
+// timelineElement is the DOM element where the timeline will be displayed
 function Timeline(timelineElement, events) {
 	this.events = events;
 	this.timelineElement = timelineElement;
@@ -133,14 +133,9 @@ Timeline.prototype = {
 		// draw timeline x-axis ticks and labels
 		var xAxisDiv = $("<div />");
 		xAxisDiv.css({
-			"border-top": "1px solid #eee", // x-axis
-			"width": this.width + "px"
+			"border-top": "1px solid #ccc" // the actual x-axis
 		});
-		for (i = 0; i != this.numTicks; ++i) {
-			var tickDiv = $("<div class='tick' />");
-			tickDiv.append(event.eventName);
-		} 
-		$(timeElement).append(xAxisDiv);
+		$(this.timeElement).append(xAxisDiv);
 		
 		
 	}
@@ -150,10 +145,11 @@ $(document).ready(function() {
 	var timelineElement = document.querySelector("#timeline");
 	var timelineObject = new Timeline(timelineElement, events);
 	timelineObject.draw();
+	this(
 }); // document.ready
 
-</script>
 
+</script>
 <style type="text/css">
 
 </style>
