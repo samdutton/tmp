@@ -6,13 +6,15 @@
 * JSON.Stringify(window.msPerformance)
 * var navStartTime = new Date(timingObj.navigationStart)
 
+And if you're not sure whether speed matters take a look at Google's research: http://googleresearch.blogspot.com/2009/06/speed-matters.html
+
 User latency
 
 Using JavaScript method, there is no way to know how long it took to get the page. 
 
 <h2>What does it all mean?</h2>
 
-The API gives access to the following events:
+The API gives access to the following navigation and events, in the following order:
 
 navigationStart
 unloadEventStart
@@ -38,7 +40,9 @@ loadEventEnd
 
 Descriptions of each of these events are available from the interface documentation (https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface) and Microsoft's performance.timing documentation (http://msdn.microsoft.com/en-us/library/ff975075).
 
-Internet Explorer 9 supports all these except secureConnectionStart, and in addition provides the msFirstPaint event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user': http://msdn.microsoft.com/en-us/library/ff974719.
+Chrome supports performance.timing in version 6 and above, and Firefox support is imminent: https://bugzilla.mozilla.org/show_bug.cgi?id=570341 
+
+Internet Explorer 9 supports all these attributes except secureConnectionStart, and in addition provides the msFirstPaint event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user': http://msdn.microsoft.com/en-us/library/ff974719.
 
 There are many useful ways to use this information, for example:
 * responseEnd - fetchStart gives an idea of network latency
@@ -65,3 +69,6 @@ Note that to use the performance.timing API in Internet Explorer 9:
 
 http://blogs.msdn.com/b/ie/archive/2010/06/28/measuring-web-page-performance.aspx
 
+http://blog.chromium.org/2010/07/do-you-know-how-slow-your-web-page-is.html
+
+Can be used without observer effect, 'in the wild'

@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+
+<title>Naïve page load test</title>
+
+<script type="text/javascript">
+
+var pageStart = Date.now();
+
+function showTimeToLoad() {
+  alert("This page took " + (Date.now() - pageStart) + "ms to load");
+}
+
+</script>
+
+</head>
+
+<body onload="showTimeToLoad()">
+	<a href="http://en.wikipedia.org/wiki/File:Uluru_(Helicopter_view)-crop.jpg" title="Uluru, helicopter view image from Wikipedia"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Uluru_%28Helicopter_view%29-crop.jpg/800px-Uluru_%28Helicopter_view%29-crop.jpg" title="Uluru, helicopter view image from Wikipedia"></a>
+</body>
+</html>

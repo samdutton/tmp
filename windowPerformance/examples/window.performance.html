@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+
+<head>
+
+<title>performance.timing: showPerformance</title>
+
+<script type="text/javascript">
+function showPerformance() {
+var keyValueArray = [];
+Object.keys(performance.timing).forEach(function(key){
+	keyValueArray.push(key + ": " + performance.timing[key]);
+})
+document.body.innerHTML = keyValueArray.join("<br />");
+}
+
+//Date.now()
+</script>
+
+
+</head>
+
+<body onload="setTimeout(showPerformance);">
+
+
+</body>
+
+</html>

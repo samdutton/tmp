@@ -8,53 +8,7 @@
 <title>Timeline</title>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-
 <script type="text/javascript">
-///////// get performance.timing events
-
-// events is an array of objects, each with a time and an event name
-// -- note that there may be more than one event for each time
-var events = []; 
-
-// names of possible events that did not occur
-var nonEvents = []; 
-
-// minTime will be used to normalise event times so they start from zero
-var minTime = Number.MAX_VALUE;
-
-// get the time value for each attribute in performance.timing
-// each attribute is the name of a navigation or page load event
-// not all of which may have occurred, for example secureConnectionStart or redirectStart
-// -- note that performance.timing properties are not enumerable in IE 9.0
-// so Object.keys() won't work here
-for (eventName in performance.timing) {	
-	var time = parseInt(performance.timing[eventName]); 
-	// events that did not occur have zero time
-	if (time === 0) {  
-		nonEvents.push(eventName);
-	} else {
-		events.push({"eventName": eventName, "time": time});
-		if (time < minTime) { 
-			minTime = time;
-		}
-	}
-}	
-
-// normalise times so they start from zero
-for (var i = 0; i != events.length; ++i) {
-	events[i].time -= minTime;
-}
-
-// sort events by time
-// -- note that object key enumeration does not guarantee this
-events.sort(function(a, b){return a.time - b.time});
-
-///////////////////////////////////////
-
-
-
-
-
 // Class for simple timelines like this:
 //
 //     |  eventFoo
@@ -140,19 +94,7 @@ Timeline.prototype = {
 		
 	}
 };
-
-$(document).ready(function() {
-	var timelineElement = document.querySelector("#timeline");
-	var timelineObject = new Timeline(timelineElement, events);
-	timelineObject.draw();
-	this(
-}); // document.ready
-
-
 </script>
-<style type="text/css">
-
-</style>
 
 </head>
 
@@ -161,5 +103,63 @@ $(document).ready(function() {
 <div id="timeline" />
 
 </body>
+
+<script type="text/javascript">
+///////// get performance.timing events
+// events is an array of objects, each with a time and an event name
+// -- note that there may be more than one event for each time
+var events = []; 
+
+// names of possible events that did not occur
+var nonEvents = []; 
+
+// minTime will be used to normalise event times so they start from zero
+var minTime = Number.MAX_VALUE;
+
+// get the time value for each attribute in performance.timing
+// each attribute is the name of a navigation or page load event
+// not all of which may have occurred, for example secureConnectionStart or redirectStart
+// -- note that performance.timing properties are not enumerable in IE 9.0
+// so Object.keys() won't work here
+function getEvents(){
+	for (eventName in performance.timing) {	
+		var time = parseInt(performance.timing[eventName]); 
+		// events that did not occur have zero time
+		if (time === 0) {  
+			nonEvents.push(eventName);
+		} else {
+			events.push({"eventName": eventName, "time": time});
+			if (time < minTime) { 
+				minTime = time;
+			}
+		}
+	}
+}
+	
+	// normalise times so they start from zero
+	for (var i = 0; i != events.length; ++i) {
+		events[i].time -= minTime;
+	}
+	
+	// sort events by time
+	// -- note that object key enumeration does not guarantee this
+	events.sort(function(a, b){return a.time - b.time});
+	
+	// now sort events so the events with the same time are 
+	// displayed in a sensible order, i.e. start before end
+	
+	
+	// draw timeline
+	var timelineElement = document.querySelector("#timeline");
+	
+	var timelineObject = new Timeline(timelineElement, events);
+	timelineObject.draw();
+	$("body").append(JSON.stringify(nonEvents));
+}
+
+
+
+
+</script>
 
 </html>
