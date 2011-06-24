@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+
+<title>Using window.performance</title>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" />
+
+<script type="text/javascript">
+
+</script>
+
+<style type="text/css">
+* {
+font-family: sans-serif;
+}
+</style>
+
+</head>
+
+<body>
+
+<p>How long does it take for a web page to load?</p>
+
+<p>...and what does 'page load' actually mean?</p>
+
+The window.performance object provides a simple API to accurate and detailed timing statistics for page navigation and loading. The object is documented in <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> which, as of June 7, 2011, was at the Editor's Draft stage of the W3C standardization process.
+
+<p>It's available now in Internet Explorer 9 and in Chrome version 6 and above. Support in Firefox and Safari is under discussion: </p>
+
+https://bugzilla.mozilla.org/show_bug.cgi?id=570341#c25
+
+<p>You can try out window.peformance from the Chrome console. On any web page:</p>
+<ul>
+	<li>Select Tools > JavaScript console from the spanner menu at the top right of the Chrome window (or press Crl-Shift-J on Windows or Linux, or Command-Option-J on a Mac)</li>
+	<li>Type in the word 'peformance' (without the quotes) next to the > prompt at the bottom of the window and press return</li>
+	<li>Click Performance to see the properties of the object: memory, navigation and timing</li>
+	<li>Click the arrow to the left of timing to see its properties </li>
+</ul>
+
+
+<h2>What does it all mean?</h2>
+
+<p>Each window.performance.timing attribute shows the time of a navigation or page load event, measured in milliseconds since midnight of January 1, 1970 (UTC). 
+
+<p>The order of these events is shown in the image below from the <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model">Navigation Timing draft</a>:</p>
+
+<a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" /></a>
+
+
+
+
+Steve Souders
+
+Innacuracy of JavaScript timings
+
+
+</body>
+
+</html>
