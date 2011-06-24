@@ -6,7 +6,7 @@
 * JSON.Stringify(window.msPerformance)
 * var navStartTime = new Date(timingObj.navigationStart)
 
-And if you're not sure whether speed matters take a look at Google's research: http://googleresearch.blogspot.com/2009/06/speed-matters.html
+..and if you're not sure whether speed matters, take a look at Google's research, which shows that delays as small as around 100 milliseconds can significantly affect user behaviour: http://googleresearch.blogspot.com/2009/06/speed-matters.html
 
 User latency
 
