@@ -17,45 +17,124 @@
 * {
 font-family: sans-serif;
 }
+code {
+display: block;
+font-family: Consolas, Courier New, monospace;
+margin-left: 1em;
+}
 </style>
 
 </head>
 
 <body>
 
-<p>How long does it take for a web page to load?</p>
+<p>Google's research shows that people like the web to be <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">fast</a>.</p>
 
-<p>...and what does 'page load' actually mean?</p>
+<p>Delays as small as 100 milliseconds can have an adverse effect &ndash; and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, 'basic advice regarding response times has been about the same for thirty years'.</p>
 
-The window.performance object provides a simple API to accurate and detailed timing statistics for page navigation and loading. The object is documented in <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> which, as of June 7, 2011, was at the Editor's Draft stage of the W3C standardization process.
+<p>But now do we measure page load speed &ndash; and what does 'page load' actually mean?</p>
 
-<p>It's available now in Internet Explorer 9 and in Chrome version 6 and above. Support in Firefox and Safari is under discussion: </p>
+<p>Web developers and JavaScript test suites like <a href="http://www2.webkit.org/perf/sunspider-0.9/sunspider.html" title="SunSpider JavaScript Benchmark" target="_blank">SunSpider</a> and <a href="http://dromaeo.com/" title="Dromaeo performance testing" target="_blank">Dromaeo</a> have used the JavaScript Date object for timing metrics. A simple speed test might use code at the top of a web page like this:</p>
 
-https://bugzilla.mozilla.org/show_bug.cgi?id=570341#c25
+<code>
+var start = Date.now();
+</code>
 
-<p>You can try out window.peformance from the Chrome console. On any web page:</p>
+<p>...and code at the bottom like this:</p>
+
+<code>
+console.log("Page load took " + Date.now() - start + "milliseconds");
+<code>
+
+<p>Using JavaScript to measure performance in this way is limited and unreliable:</p>
+
+<ul>
+	<li>the the timing code is in the page, so it will <a href="http://en.wikipedia.org/wiki/Observer_effect_(information_technology)" title="Wikipedia article: Observer effect (information technology)" target="_blank">effect</a> how the page loads in ways that are complex to quantify</li>
+	<li>JavaScript time is <a href="http://ejohn.org/blog/accuracy-of-javascript-time/" title="John Resig: Accuracy of JavaScript Time" target="_blank">not accurate</a></li>
+	<li>unless you're prepared to leave timing code in the page, you won't be able to measure page load speeds in the wild.</li>
+</ul>
+
+<p>Worst of all, this in-the-page approach can't measure the total latency users experience, since that includes processes such as DNS resolution and server response that occur before page content (and JavaScript timing code) begins to load. It is possible to use cookies to measure the time taken between one page load and the next, as long as you host both the pages &ndash; but not for the crucial first visit to a website: that small window of opportunity in which users are either enticed or repelled.</p>
+
+
+<p><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> changes all that.</p>
+
+	<p>This API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading. </p>
+
+<p>It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and in Chrome version 6 and above. It is hoped that the API might be implemented in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="Mozilla bug report" target="_blank">Firefox 6</a>.</p>
+
+
+<p>The simplest way to try out the API is to take a look at a window.performance object in a JavaScript console. For example, on any web page in Chrome:</p>
 <ul>
 	<li>Select Tools > JavaScript console from the spanner menu at the top right of the Chrome window (or press Crl-Shift-J on Windows or Linux, or Command-Option-J on a Mac)</li>
-	<li>Type in the word 'peformance' (without the quotes) next to the > prompt at the bottom of the window and press return</li>
+	<li>Type in the word 'performance' (without the quotes) next to the > prompt at the bottom of the window and press return</li>
 	<li>Click Performance to see the properties of the object: memory, navigation and timing</li>
-	<li>Click the arrow to the left of timing to see its properties </li>
+	<li>Click the arrow to the left of timing to see its properties.</li>
 </ul>
+
+<p>You should see something like this</p>
+
+<code>
+connectEnd: 1309194386183<br />
+connectStart: 1309194386083<br />
+domComplete: 1309194387358<br />
+domContentLoadedEventEnd: 1309194386654<br />
+domContentLoadedEventStart: 1309194386591<br />
+domInteractive: 1309194386591<br />
+domLoading: 1309194386317<br />
+domainLookupEnd: 1309194386083<br />
+domainLookupStart: 1309194386083<br />
+fetchStart: 1309194385978<br />
+loadEventEnd: 1309194387363<br />
+loadEventStart: 1309194387358<br />
+navigationStart: 1309194385978<br />
+redirectEnd: 0<br />
+redirectStart: 0<br />
+requestStart: 1309194386183<br />
+responseEnd: 1309194386514<br />
+responseStart: 1309194386314<br />
+secureConnectionStart: 0<br />
+unloadEventEnd: 0<br />
+unloadEventStart: 0<br />
+</code>
+
 
 
 <h2>What does it all mean?</h2>
 
 <p>Each window.performance.timing attribute shows the time of a navigation or page load event, measured in milliseconds since midnight of January 1, 1970 (UTC). 
 
+<p>Descriptions of each of these events are available from the W3C <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">interface draft</a> and Microsoft's performance.timing <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">documentation</a>.</p>
+
+<p>Internet Explorer 9 supports all these attributes except secureConnectionStart, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank">msFirstPaint</a> event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user'.</p>
+
+<p>There are many useful ways to use this information:</p>
+<ul>
+	<li>responseEnd - fetchStart: network latency</li>
+	<li>loadEventEnd - responseEnd: how long the page took to load after it was received from the server</li>
+	<li>loadEventEnd - navigationStart: how long the whole process of navigation and page load took.</li>
+</ul>
+
+
 <p>The order of these events is shown in the image below from the <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model">Navigation Timing draft</a>:</p>
 
 <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" /></a>
 
+<h2>How did I get here?</h2>
 
+<p>There are, of course, several ways to 'open a page'. This is where <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-info-interface" title="W3C PerformanceNavigation interface documentation" target="_blank">performance.navigation</a> comes in handy. This API has just two attributes:</p>
+<ul>
+	<li>redirectCount: the number of times the document request was redirected</li>
+	<li>type: the navigation that lead to the page being loaded:</li>
+	<li>
+		<ul>
+			<li>action by the user such as clicking a link or entering a URL in the browser address bar</li>
+			<li>page reload</li>
+			<li>moving back or forward through history.</li>
+		</ul>
+	</li>
+</ul>
 
-
-Steve Souders
-
-Innacuracy of JavaScript timings
 
 
 </body>

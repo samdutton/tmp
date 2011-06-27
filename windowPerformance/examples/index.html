@@ -35,10 +35,10 @@ function Timeline(timelineElement, events) {
 
 	// defaults for event name display
 	// could easily be refactored to make these values customisable
-    this.eventBorderLeftColor = "#faa"; 
+    this.eventBorderLeftColor = "#080"; 
     this.eventBorderLeftStyle = "solid"; 
     this.eventBorderLeftWidth = 2; 
-    this.eventColor = "#644"; 
+    this.eventColor = "#666"; 
     this.eventMargin = 5;
     this.eventPadding = 5;
     this.eventWidth = 220; // hack: large enough to fit longest event name...
@@ -134,8 +134,8 @@ $(document).ready(function(){
 	}
 	
 	// sort events by time, since object key enumeration does not guarantee this
-	// if events have the same time, order them so the event names will be  
-	// displayed in a sensible order, e.g. unloadEventStart before unloadEventEnd
+	// -- and if events have the same time, order them so the event names are displayed  
+	// in a sensible order, e.g. unloadEventStart before unloadEventEnd
 	var orderedEventNames = ["navigationStart", "unloadEventStart", "unloadEventEnd", "redirectStart", "redirectEnd", "fetchStart", "domainLookupStart", "domainLookupEnd", "connectStart", "connectEnd", "secureConnectionStart", "requestStart", "responseStart", "responseEnd", "domLoading", "domInteractive", "domContentLoadedEventStart", "domContentLoadedEventEnd", "domComplete", "loadEventStart", "loadEventEnd"]	
 	events.sort(function(a, b){
 		// if times are different, sort by time
@@ -158,24 +158,26 @@ $(document).ready(function(){
 	// draw basic timeline x-axis ticks and labels
 	var xAxisDiv = $("<div />");
 		xAxisDiv.css({
-		"border-top": "2px solid #f99", // the actual x-axis
+		"border-top": "2px solid #060", // the actual x-axis
 		"height": "40px",
 		"margin": "10px 0 20px 0",
 		"position": "relative"
 	});	
 	
-	// hack for minimal x-axis ticks
+	// add ticks to the x-axis: for zero and for the maximum time, timelineObject.maxTime
+	var tickDivWidth = 100;
 	var tickDivCss = {
-		"color": "#f99",
+		"color": "#060",
 		"position": "absolute", 
 		"text-align": "center",
 		"top": "-4px",
-		"width": "100px"
+		"width": tickDivWidth + "px"
 		};
-	// I realise this is grim and ununderstandable...
-	var zeroTickDiv = $("<div>|<br />0</div>").css(tickDivCss).css({"left": -50}); // 50 = half width
+	// this is hacky, but it works
+	var zeroTickDiv = $("<div>|<br />0</div>").css(tickDivCss).css({"left": -tickDivWidth / 2}); // 50 = half width
+	// get the css left value for the max tick 
 	var maxTickDivLeft = timelineObject.width - timelineObject.eventWidth - 
-		timelineObject.eventPadding - timelineObject.eventBorderLeftWidth - 49; // 50 = half width
+		timelineObject.eventPadding - timelineObject.eventBorderLeftWidth - (tickDivWidth / 2); 
 	var maxTickDiv = $("<div>|<br />" + timelineObject.maxTime + "ms</div>").css(tickDivCss).
 		css({"left": maxTickDivLeft});
 	xAxisDiv.append(zeroTickDiv).append(maxTickDiv);
