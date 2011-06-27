@@ -10,30 +10,8 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 
 <script type="text/javascript">
-
-// used for the #atts div
-function writeDynamicElements(){
-    var atts = [];
-    if (!performance || !performance.timing) {
-        alert("This page includes content created dynamically using the performance.timing API, which your browser does not support.\nPlease install Google Chrome or Internet Explorer 9 if you wish to view the dynamic content on this page.");
-        return;
-    }
-    var t = performance.timing;
-    for (prop in t) {
-//        if (performance.timing.hasOwnProperty(prop)) { // doesn't work in IE9
-            atts.push(prop + ": " + t[prop]); 
-//        }
-    }
-    atts.sort(); // in the console attributes are displayed in alphabetical order
-    $("#atts").append(atts.join("<br />"));
-    
-    $("#networkLatency").html((t.responseEnd - t.fetchStart) + "ms");
-    $("#pageLoad").html((t.loadEventEnd - t.responseEnd) + "ms");
-    $("#soupToNuts").html((t.loadEventEnd - t.navigationStart) + "ms");
-}
-
 $(document).ready(function(){
-    setTimeout(writeDynamicElements, 10);
+    setTimeout(writeAtts);
 });
 </script>
 
@@ -42,9 +20,8 @@ $(document).ready(function(){
 font-family: sans-serif;
 }
 code {
+display: block;
 font-family: Consolas, Courier New, monospace;
-}
-code.block {
 margin-left: 1em;
 }
 </style>
@@ -62,20 +39,20 @@ margin-left: 1em;
 
 <p>Web developers and test suites like <a href="http://www2.webkit.org/perf/sunspider-0.9/sunspider.html" title="SunSpider JavaScript Benchmark" target="_blank">SunSpider</a> and <a href="http://dromaeo.com/" title="Dromaeo performance testing" target="_blank">Dromaeo</a> use the JavaScript Date object for timing metrics. A simple speed test might use code at the start of a web page like this:</p>
 
-<code class="block">
+<code>
 var start = Date.now();
 </code>
 
 <p>...with code at the end of the page like this:</p>
 
-<code class="block">
+<code>
 console.log("Page load took " + Date.now() - start + "milliseconds");
 </code>
 
 <p>Using JavaScript to measure performance in this way is limited and unreliable:</p>
 
 <ul>
-	<li>the timing code is in the page, so it will cause an <a href="http://en.wikipedia.org/wiki/Observer_effect_(information_technology)" title="Wikipedia article: Observer effect (information technology)" target="_blank">observer effect</a> and change the how the page loads, in ways that may be impossible to quantify</li>
+	<li>the timing code is in the page, so it will cause an <a href="http://en.wikipedia.org/wiki/Observer_effect_(information_technology)" title="Wikipedia article: Observer effect (information technology)" target="_blank">observer effect</a>, changing the way the page loads in ways that may be impossible to quantify</li>
 	<li>JavaScript time is <a href="http://ejohn.org/blog/accuracy-of-javascript-time/" title="John Resig: Accuracy of JavaScript Time" target="_blank">not accurate</a></li>
 	<li>unless you're happy to leave timing code in a page, you won't be able to measure load speeds in the wild.</li>
 </ul>
@@ -88,11 +65,11 @@ console.log("Page load took " + Date.now() - start + "milliseconds");
 
 <p>Note that in order to use the performance.timing API in Internet Explorer 9:</p> 
 <ul>
-    <li>on a web page, use the <code>&lt;!doctype html&gt;</code> directive to ensure the document is displayed in <a href="http://msdn.microsoft.com/en-us/library/cc288325" title="MSDN: Defining Document Compatibility">Internet Explorer 9 mode</a></li>
+    <li>on a web page, use the <pre><!doctype html><pre> directive to ensure the document is displayed in <a href="http://msdn.microsoft.com/en-us/library/cc288325" title="MSDN: Defining Document Compatibility">Internet Explorer 9 mode</a></li>
     <li>in the Internet Explorer developer tools console, you may need to adjust the browser or document mode.</li>
 </ul>
 
-<p>The simplest way to try out the API is to take a look at a window.performance object in the browser's developer tools JavaScript console. For example, from any web page in Google Chrome:</p>
+<p>The simplest way to try out the API is to take a look at a window.performance object in the browser's developer tools JavaScript console. For example, from any web page in Go<font size="+1"></font>ogle Chrome:</p>
 <ul>
 	<li>Select <em>Tools > JavaScript console</em> from the spanner menu at the top right of the Chrome window (or press <em>Crl-Shift-J</em> on Windows or Linux, or<em> Command-Option-J</em> on a Mac)</li>
 	<li>Type in the word <em>performance</em> next to the > prompt at the bottom of the window and press return</li>
@@ -100,46 +77,59 @@ console.log("Page load took " + Date.now() - start + "milliseconds");
 	<li>Click the arrow to the left of timing to see its properties.</li>
 </ul>
 
-<p>You should see something like the following (which has been generated with code on this page):</p>
+<p>You should see something like the following, which has been generated with code on this page:</p>
 
-<code id="atts"></code> <!-- filled dynamically by the writeDynamicElements() function -->
+<code id="atts"></code> <!-- filled dynamically by code that follows -->
+
+<script type="text/javascript">
+function writeAtts(){
+    var atts = [];
+    for (prop in performance.timing) {
+        if (performance.timing.hasOwnProperty(prop)) {
+            atts.push(prop + ": " + performance.timing[prop]); 
+        }
+    }
+    atts.sort(); // in the console attributes are displayed in alphabetical order
+    $("#atts").append(atts.join("<br />"));
+}
+</script>
+
 
 <h2>What does it all mean?</h2>
 
 <p>Each performance.timing attribute shows the time of a navigation or page load event, measured in milliseconds since midnight of January 1, 1970 (UTC). A zero value means that an event (such as secureConnectionStart or redirectStart) did not occur.</p>
 
-<p>These events are described in Microsoft's <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">performance.timing documentation</a> and, more formally, in the <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">W3C interface draft</a> .</p>
+<p>Descriptions of each of these events are available from the W3C <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">interface draft</a> and Microsoft's performance.timing <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">documentation</a>.</p>
 
-<p>Internet Explorer 9 supports all the attributes described in the API draft except secureConnectionStart, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank">msFirstPaint</a> event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user'.</p>
+<p>Internet Explorer 9 supports all these attributes except secureConnectionStart, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank">msFirstPaint</a> event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user'.</p>
 
 <p>There are many useful ways to use this information:</p>
 <ul>
-	<li>responseEnd - fetchStart: network latency(<span id="networkLatency"></span>)</li>
-	<li>loadEventEnd - responseEnd: how long the page took to load after it was received from the server (<span id="pageLoad"></span>)</li>
-	<li>loadEventEnd - navigationStart: the whole process of navigation and page load from soup to nuts (<span id="soupToNuts"></span>).</li>
+	<li>responseEnd - fetchStart: network latency</li>
+	<li>loadEventEnd - responseEnd: how long the page took to load after it was received from the server</li>
+	<li>loadEventEnd - navigationStart: how long the whole process of navigation and page load took.</li>
 </ul>
 
-(The numbers in brackets are 'real' values generated by code running on this page.)
 
 <p>The order of these events is shown in the image below from the <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model">Navigation Timing draft</a>:</p>
 
-<div><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" style="width: 100%" /></a></div>
+<a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" /></a>
 
 <h2>How did I get here?</h2>
 
 <p>There are, of course, several ways to 'open a page'. This is where <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-info-interface" title="W3C PerformanceNavigation interface documentation" target="_blank">performance.navigation</a> comes in handy. This API has just two attributes:</p>
 <ul>
-	<li><strong>redirectCount</strong>: the number of times the document request was redirected</li>
-	<li><strong>type</strong>: the navigation that lead to the page being loaded.
-    </li>
+	<li>redirectCount: the number of times the document request was redirected</li>
+	<li>type: the navigation that lead to the page being loaded:</li>
+	<li>
+		<ul>
+			<li>action by the user such as clicking a link or entering a URL in the browser address bar</li>
+			<li>page reload</li>
+			<li>moving back or forward through history.</li>
+		</ul>
+	</li>
 </ul>
 
-<p>Type is an enumeration that will be assigned one of three values: </p>
-<ul>
-    <li>0: action by the user such as clicking a link or entering a URL in the browser address bar</li>
-    <li>1: page reload</li>
-    <li>2: navigation by moving back or forward through history</li>
-</ul>
 
 
 </body>
