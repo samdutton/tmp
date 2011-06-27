@@ -5,13 +5,193 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
 
-<title>Using window.performance</title>
+<title>Navigation Timing tutorial</title>
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 
+
 <script type="text/javascript">
 
-// used for the #atts div
+// Timeline class used for div#timeline chart.
+// The Google Charts API could also be used, but does not support simple timelines.
+// Constructor arguments:
+// - timelineElement is the DOM element where the timeline will be displayed
+// - events is an array of objects that each have a time and eventName property
+function Timeline(timelineElement, events) {
+	this.events = events;
+	this.timelineElement = timelineElement;
+	// get the minimum and maximum time values
+	this.minTime = Number.MAX_VALUE;
+	this.maxTime = Number.MIN_VALUE;
+	for (var i = 0; i != events.length; ++i) {
+		var time = events[i].time;
+		if (time > this.maxTime) {
+			this.maxTime = time;
+		}
+		if (time < this.minTime) {
+			this.minTime = time;
+		}
+	}
+
+	// defaults for event name display
+	// could easily be refactored to make these values customisable
+    this.backgroundColor = "#eee"; 
+    this.eventBorderLeftColor = "#080"; 
+    this.eventBorderLeftStyle = "solid"; 
+    this.eventBorderLeftWidth = 2; 
+    this.eventColor = "#666"; 
+    this.eventMargin = 5;
+    this.eventPadding = 5;
+    this.eventWidth = 220; // hack: large enough to fit longest event name...
+
+    // flag: to combine events with the same time in the same div
+    this.combineEvents = true;
+
+	// defaults for timeline
+    this.fontFamily = "Consolas, sans-serif";
+	this.numTicks = 5; // number of ticks on x-axis
+	this.padding = 10; 	
+	this.width = 800; 	
+
+	$(timelineElement).css({
+		"background-color": this.backgroundColor,
+		"font-family": this.fontFamily,
+        "padding": this.padding + "px",
+		"width": this.width + "px"
+		}); 	
+ }
+
+Timeline.prototype = {
+	draw: function() {
+		var i;
+		// draw event divs
+		for (i = 0; i != this.events.length; ++i) {
+			var event = this.events[i];
+			var eventDiv = $("<div />");
+			eventDiv.append(event.eventName);
+			// get the offset for the event div
+			var left = (event.time / this.maxTime) * (this.width - 
+					this.eventWidth - this.eventPadding - this.eventBorderLeftWidth);
+            eventDiv.css({
+                "border-left-color": this.eventBorderLeftColor,
+                "border-left-style": this.eventBorderLeftStyle,
+                "border-left-width": this.eventBorderLeftWidth + "px",
+                "color": this.eventColor,
+                "cursor": "pointer",
+                "left": left, 
+                "margin-bottom": this.eventMargin + "px",
+                "padding-left": this.eventPadding + "px",
+                "position": "relative",
+                "width": this.eventWidth + "px"
+            });
+            eventDiv.attr({"title": event.time + "ms"});
+			$("#timeline").append(eventDiv);
+		};		
+		// draw timeline x-axis ticks and labels
+		var xAxisDiv = $("<div />");
+		xAxisDiv.css({
+			"border-top": "1px solid #ccc" // the actual x-axis
+		});
+		$(this.timeElement).append(xAxisDiv);
+		
+		
+	}
+}; // Timeline class
+
+	
+function writeTimeline() {
+	// events is an array of objects, each with a time and an event name
+	// -- note that there may be more than one event for each time
+	var events = []; 
+	
+	// names of possible events that did not occur
+	var nonEvents = []; 
+	
+	// minTime will be used to normalise event times so they start from zero
+	var minTime = Number.MAX_VALUE;
+	
+	// get the time value for each attribute in performance.timing
+	// each attribute is the name of a navigation or page load event
+	// not all of which may have occurred, for example secureConnectionStart or redirectStart
+	// -- performance.timing properties aren't enumerable in IE 9.0 so Object.keys() won't work
+	for (eventName in performance.timing) {	
+		var time = parseInt(performance.timing[eventName]); 
+		// events that did not occur have zero time
+		if (time === 0) {  
+			nonEvents.push(eventName);
+        // hack! but IE 9.0 doesn't seem to support 
+        // performance.timing.hasOwnProperty correctly 
+		} else if (eventName !== "toJSON") { 
+			events.push({"eventName": eventName, "time": time});
+			if (time < minTime) { 
+				minTime = time;
+			}
+		}
+	}
+		
+	// normalise times so they start from zero
+	for (var i = 0; i != events.length; ++i) {
+		events[i].time -= minTime;
+	}
+	
+	// sort events by time, since object key enumeration does not guarantee this
+	// -- and if events have the same time, order them so the event names are displayed  
+	// in a sensible order, e.g. unloadEventStart before unloadEventEnd
+	var orderedEventNames = ["navigationStart", "unloadEventStart", "unloadEventEnd", "redirectStart", "redirectEnd", "fetchStart", "domainLookupStart", "domainLookupEnd", "connectStart", "connectEnd", "secureConnectionStart", "requestStart", "responseStart", "responseEnd", "domLoading", "domInteractive", "domContentLoadedEventStart", "domContentLoadedEventEnd", "domComplete", "loadEventStart", "loadEventEnd"]	
+	events.sort(function(a, b){
+		// if times are different, sort by time
+		if (a.time !== b.time) {
+			return a.time - b.time;
+		// if times are the same, sort by position in orderedEventNames
+		} else {
+			// indexOf is available in IE9 and Chrome
+ 			return orderedEventNames.indexOf(a.eventName) - orderedEventNames.indexOf(b.eventName);
+		}
+	});
+
+
+	// draw timeline
+	var timelineElement = document.querySelector("#timeline");	
+	var timelineObject = new Timeline(timelineElement, events);
+	timelineObject.draw();
+
+	// draw basic timeline x-axis ticks and labels
+	var xAxisDiv = $("<div />");
+		xAxisDiv.css({
+		"border-top": "1px solid #060", // the actual x-axis
+		"height": "40px",
+		"margin": "10px 0 20px 0",
+		"position": "relative"
+	});	
+	
+	// add ticks to the x-axis: for zero and for the maximum time, timelineObject.maxTime
+	var tickDivWidth = 100;
+	var tickDivCss = {
+		"color": "#060",
+		"position": "absolute", 
+		"text-align": "center",
+		"top": "-3px",
+		"width": tickDivWidth + "px"
+		};
+	// this is hacky and ugly but it works
+	var zeroTickDiv = $("<div>|<br />0</div>").css(tickDivCss).css({"left": -tickDivWidth / 2}); // 50 = half width
+	// get the css left value for the max tick 
+	var maxTickDivLeft = timelineObject.width - timelineObject.eventWidth - 
+		timelineObject.eventPadding - timelineObject.eventBorderLeftWidth - (tickDivWidth / 2); 
+	var maxTickDiv = $("<div>|<br />" + timelineObject.maxTime + "ms</div>").css(tickDivCss).
+		css({"left": maxTickDivLeft});
+	xAxisDiv.append(zeroTickDiv).append(maxTickDiv);
+	
+	$(timelineElement).append(xAxisDiv);
+	
+	$(timelineElement).append("<div id='nonEvents'>The following events did not occur:<br/>- " + 
+		nonEvents.join("<br />- ") + "</div>");
+
+
+} // writeTimeline;
+
+
+// used for the #atts div and the 'ways to use this information' spans
 function writeDynamicElements(){
     var atts = [];
     if (!performance || !performance.timing) {
@@ -30,22 +210,36 @@ function writeDynamicElements(){
     $("#networkLatency").html((t.responseEnd - t.fetchStart) + "ms");
     $("#pageLoad").html((t.loadEventEnd - t.responseEnd) + "ms");
     $("#soupToNuts").html((t.loadEventEnd - t.navigationStart) + "ms");
+
+    var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
+    var howIGotHere = navigationTypes[performance.navigation.type];
+    $("#howIGotHere").html(howIGotHere);
+    
+    writeTimeline();
 }
 
 $(document).ready(function(){
-    setTimeout(writeDynamicElements, 10);
+    setTimeout(writeDynamicElements, 100);
 });
 </script>
+
 
 <style type="text/css">
 * {
 font-family: sans-serif;
+}
+a, img {
+border: none;
 }
 code {
 font-family: Consolas, Courier New, monospace;
 }
 code.block {
 margin-left: 1em;
+}
+hr {
+color: #eee;
+height: 1px;
 }
 </style>
 
@@ -54,13 +248,15 @@ margin-left: 1em;
 
 <body>
 
-<p>People like it when web pages <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">load quickly</a>.</p>
+<h1>Navigation Timing tutorial</h1>
+
+<p>People like web pages that <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">load quickly</a>.</p>
 
 <p>Delays as small as a hundred milliseconds can have an adverse effect &ndash; and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, 'basic advice regarding response times has been about the same for thirty years'.</p>
 
 <p>But now do we measure web page load speed &ndash; and what does 'page load' actually mean?</p>
 
-<p>Web developers and test suites like <a href="http://www2.webkit.org/perf/sunspider-0.9/sunspider.html" title="SunSpider JavaScript Benchmark" target="_blank">SunSpider</a> and <a href="http://dromaeo.com/" title="Dromaeo performance testing" target="_blank">Dromaeo</a> use the JavaScript Date object for timing metrics. A simple speed test might use code at the start of a web page like this:</p>
+<p>Web developers, and test suites like <a href="http://www2.webkit.org/perf/sunspider-0.9/sunspider.html" title="SunSpider JavaScript Benchmark" target="_blank">SunSpider</a> and <a href="http://dromaeo.com/" title="Dromaeo performance testing" target="_blank">Dromaeo</a>, use the JavaScript Date object for timing metrics. A simple speed test might use code at the start of a web page like this:</p>
 
 <code class="block">
 var start = Date.now();
@@ -69,7 +265,7 @@ var start = Date.now();
 <p>...with code at the end of the page like this:</p>
 
 <code class="block">
-console.log("Page load took " + Date.now() - start + "milliseconds");
+console.log("Page load took " + (Date.now() - start) + "milliseconds");
 </code>
 
 <p>Using JavaScript to measure performance in this way is limited and unreliable:</p>
@@ -94,7 +290,7 @@ console.log("Page load took " + Date.now() - start + "milliseconds");
 
 <p>The simplest way to try out the API is to take a look at a window.performance object in the browser's developer tools JavaScript console. For example, from any web page in Google Chrome:</p>
 <ul>
-	<li>Select <em>Tools > JavaScript console</em> from the spanner menu at the top right of the Chrome window (or press <em>Crl-Shift-J</em> on Windows or Linux, or<em> Command-Option-J</em> on a Mac)</li>
+	<li>Select <em>Tools > JavaScript console</em> from the spanner menu at the top right of the Chrome window (or press <em>Ctrl-Shift-J</em> on Windows or Linux, or<em> Command-Option-J</em> on a Mac)</li>
 	<li>Type in the word <em>performance</em> next to the > prompt at the bottom of the window and press return</li>
 	<li>Click Performance to see the properties of the object: memory, navigation and timing</li>
 	<li>Click the arrow to the left of timing to see its properties.</li>
@@ -121,6 +317,8 @@ console.log("Page load took " + Date.now() - start + "milliseconds");
 
 (The numbers in brackets are 'real' values generated by code running on this page.)
 
+<p>It would be straightforward &ndash; though somewhat resource hungry &ndash; to pass this data back to the host server using AJAX every time a page was loaded, or (for example) to get performance.timing data for certain users, keep the data in localStorage, then package and send it to the server as appropriate.</p>
+
 <p>The order of these events is shown in the image below from the <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model">Navigation Timing draft</a>:</p>
 
 <div><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" style="width: 100%" /></a></div>
@@ -134,13 +332,22 @@ console.log("Page load took " + Date.now() - start + "milliseconds");
     </li>
 </ul>
 
-<p>Type is an enumeration that will be assigned one of three values: </p>
+<p>Type is an enumeration that will be have one of three values: </p>
 <ul>
     <li>0: action by the user such as clicking a link or entering a URL in the browser address bar</li>
     <li>1: page reload</li>
     <li>2: navigation by moving back or forward through history</li>
 </ul>
 
+<p>You got to this page by <span id="howIGotHere"></span>.</p>
+
+<hr />
+
+<p>Below is a timeline of all the performance.timing events that occurred in navigating to this page and loading its content, normalised to start from zero.</p>
+
+<p>Hover the cursor over each item to see the exact event time.</p>
+
+<div id="timeline"></div>
 
 </body>
 
