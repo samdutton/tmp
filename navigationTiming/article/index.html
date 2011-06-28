@@ -255,9 +255,9 @@ height: 1px;
 
 <h1>Navigation Timing tutorial</h1>
 
-<p>People like web pages that <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">load quickly</a>.</p>
+<p>People like web pages that load quickly.</p>
 
-<p>Delays as small as a hundred milliseconds can have an adverse effect &ndash; and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, 'basic advice regarding response times has been about the same for thirty years'.</p>
+<p>Delays as small as a hundred milliseconds <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">can have an adverse effect</a> and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, 'basic advice regarding response times has been about the same for thirty years'.</p>
 
 <p>But now do we measure web page load speed &ndash; and what does 'page load' actually mean?</p>
 
@@ -285,7 +285,7 @@ console.log("Page load took " + (Date.now() - start) + "milliseconds");
 
 <p><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> changes all that.</p>
 
-<p>This API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading.  It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and in <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a> version 6 and above. It is hoped that the API might be implemented in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="Mozilla bug report" target="_blank">Firefox 6</a>.</p>
+<p>This API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading. It can measure latency as actually experienced by users. It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and in <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a> version 6 and above. It is hoped that the API might be implemented in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="Mozilla bug report" target="_blank">Firefox 6</a>.</p>
 
 <p>Note that in order to use the performance.timing API in Internet Explorer 9:</p> 
 <ul>
