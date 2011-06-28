@@ -207,9 +207,14 @@ function writeDynamicElements(){
     atts.sort(); // in the console attributes are displayed in alphabetical order
     $("#atts").append(atts.join("<br />"));
     
-    $("#networkLatency").html((t.responseEnd - t.fetchStart) + "ms");
-    $("#pageLoad").html((t.loadEventEnd - t.responseEnd) + "ms");
-    $("#soupToNuts").html((t.loadEventEnd - t.navigationStart) + "ms");
+    $("#networkLatency").html("for this page, " + (t.responseEnd - t.fetchStart) + "ms");
+//	var pageLoadMessage = t.loadEventEnd == 0 ? 
+// 		"unable to calculate in the page, because loadEventEnd had not yet occurred" : 
+//     	(t.loadEventEnd - t.responseEnd) + "ms";
+//  $("#pageLoad").html(pageLoadMessage);
+//  var soupToNutsMessage = t.loadEventEnd == 0 ? "likewise!" : 
+// 		(t.loadEventEnd - t.navigationStart) + "ms"
+//  $("#soupToNuts").html(soupToNutsMessage);
 
     var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
     var howIGotHere = navigationTypes[performance.navigation.type];
@@ -219,7 +224,7 @@ function writeDynamicElements(){
 }
 
 $(document).ready(function(){
-    setTimeout(writeDynamicElements, 100);
+    setTimeout(writeDynamicElements, 10);
 });
 </script>
 
@@ -276,7 +281,7 @@ console.log("Page load took " + (Date.now() - start) + "milliseconds");
 	<li>unless you're happy to leave timing code in a page, you won't be able to measure load speeds in the wild.</li>
 </ul>
 
-<p>Worst of all, this in-the-page approach can't measure the total latency users experience when they 'open a page', whether they click on a link or enter a URL in the address bar of their browser, since that latency includes processes such as DNS resolution and server response that occur before page content (and JavaScript timing code) loads. It is possible to use cookies to measure the time taken between the unloading of one page, and loading of the next, but only if you host both pages. This won't work for the crucial first visit to a website &ndash; that small window of opportunity in which new users are either enticed or repelled &ndash; and can only give a total figure, without taking into account nuances such as redirection times.</p>
+<p>Worst of all, this in-the-page approach can't measure the total latency users experience when they 'open a page', whether they click on a link or enter a URL in the address bar of their browser, since that latency includes processes such as DNS resolution and server response that occur before page content (and JavaScript timing code) loads. It is possible to use cookies to measure the time taken between the unloading of one page, and loading of the next, but only if you host both pages. This won't work when a user first visits your website &ndash; and can only give a total figure for network latency, without breaking down the data to give specific information about redirection or DNS delays, for example.</p>
 
 <p><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> changes all that.</p>
 
@@ -304,20 +309,18 @@ console.log("Page load took " + (Date.now() - start) + "milliseconds");
 
 <p>Each performance.timing attribute shows the time of a navigation or page load event, measured in milliseconds since midnight of January 1, 1970 (UTC). A zero value means that an event (such as secureConnectionStart or redirectStart) did not occur.</p>
 
-<p>These events are described in Microsoft's <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">performance.timing documentation</a> and, more formally, in the <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">W3C interface draft</a> .</p>
+<p>These events are described in Microsoft's <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">performance.timing documentation</a> and more formally in the <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">W3C interface draft</a> .</p>
 
 <p>Internet Explorer 9 supports all the attributes described in the API draft except secureConnectionStart, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank">msFirstPaint</a> event, which occurs after loadEventEnd 'when the document loaded by the window object began to be displayed to the user'.</p>
 
 <p>There are many useful ways to use this information:</p>
 <ul>
-	<li>responseEnd - fetchStart: network latency(<span id="networkLatency"></span>)</li>
-	<li>loadEventEnd - responseEnd: how long the page took to load after it was received from the server (<span id="pageLoad"></span>)</li>
-	<li>loadEventEnd - navigationStart: the whole process of navigation and page load from soup to nuts (<span id="soupToNuts"></span>).</li>
+	<li>responseEnd - fetchStart: network latency (<span id="networkLatency"></span>)</li>
+	<li>loadEventEnd - responseEnd: how long the page took to load after it was received from the server</li>
+	<li>loadEventEnd - navigationStart: the whole process of navigation and page load.</li>
 </ul>
 
-(The numbers in brackets are 'real' values generated by code running on this page.)
-
-<p>It would be straightforward &ndash; though somewhat resource hungry &ndash; to pass this data back to the host server using AJAX every time a page was loaded, or (for example) to get performance.timing data for certain users, keep the data in localStorage, then package and send it to the server as appropriate.</p>
+<p>There are several ways that performance.timing data could provide information about page load latency in the wild. It would be straightforward to use XHR to pass timing data to the host server every time a page was loaded. This would produce statistics in real time, but would not be very efficient. Alternatively, performance.timing data could (for example) be recorded in localStorage for a subset of users for a subset of pages, and periodically a report could be packaged and filed to the server.</p>
 
 <p>The order of these events is shown in the image below from the <a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model">Navigation Timing draft</a>:</p>
 
