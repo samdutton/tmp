@@ -1,0 +1,65 @@
+/**
+ * Copyright 2011 Google, Inc. All Rights Reserved
+ *
+ * @author jasonstredwick@google.com (Jason Stredwick)
+ */
+
+
+#layer-status-console.layer-console {
+  min-height: 0px;
+  min-width: 0px;
+
+  resize: none;
+}
+
+/**
+ * Control the table format for displaying layer configuration information.
+ */
+#layer-status-console .layer-console-body table {
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+
+#layer-status-console .layer-console-body table td {
+  border: 2px solid #bbb;
+  padding: 1px 5px;
+}
+
+#layer-status-console .layer-console-body table thead td {
+  background: #4a70aa;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+}
+
+#layer-status-console .layer-console-body table tr {
+  background: #fff;
+}
+
+#layer-status-console .layer-console-body table tr:nth-child(even) {
+  background: #f0f0ff;
+}
+
+#layer-status-console .layer-console-body table td {
+  text-align: left;
+  width: auto;
+}
+
+/**
+ * Controls the name column.
+ */
+#layer-status-console .layer-console-body table td:last-child {
+  min-width: 210px;
+  max-width: 500px;
+  width: auto;
+}
+
+/**
+ * Control the button and image centering within the table.
+ */
+#layer-status-console .layer-console-body table input:not([type="radio"]),
+#layer-status-console .layer-console-body table image {
+  margin: auto;
+  width: 100%;
+}
+

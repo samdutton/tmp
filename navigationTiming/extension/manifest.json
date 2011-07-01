@@ -4,7 +4,7 @@
 	"description" : "Display a timeline of navigation and page load events for the current page",
 	"background_page" : "background.html",
 	"browser_action" : {
-		"default_icon" : "22.png",
+		"default_icon" : "images/22.png",
 		"popup" : "popup.html",
 		"default_title" : "Click to view a timeline of navigation and page load events for the current page"
 	},
