@@ -7,42 +7,42 @@
 
 <title>Page Visibility demo</title>
 
+</head>
+
+<body>
+
+<!-- <Audio src="Audio/search.mov" autoplay /> -->
+<audio id="audioElement" src="audio/tearsOfJoy.m4a" autoplay controls />
+
 <script src="js/jquery-1.6.1.js"></script>
 
 <script type="text/javascript">
 
-function pauseVideo(){
-	alert("pauseVideo");
+function pauseAudio(){
+	console.log("pauseAudio");
+	document.getElementById("audioElement").pause();
 }
 
-function playVideo(){
-	alert("playVideo");
+function playAudio(){
+	console.log("playAudio");
+	document.getElementById("audioElement").play();
 }
 
 function handleVisibilityChange() {
 	if (document.webkitHidden) {
-		pauseVideo();
+		pauseAudio();
 	} else {
-		playVideo();
+		playAudio();
 	}
 }
 
 document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
 
+// if document doesn't support webkitHidden
 if (!document.webkitHidden) {
-	playVideo(); 
+	playAudio(); 
 }
 </script>
-
-<style type="text/css">
-
-</style>
-
-</head>
-
-<body>
-
-<video src="video/search.mov" />
 
 </body>
 
