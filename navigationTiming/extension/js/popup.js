@@ -1,6 +1,20 @@
 var backgroundPage = chrome.extension.getBackgroundPage();
+var timing;
+// var timing = backgroundPage.pagePerformance.timing;
+// 	console.log("in popup");
+// console.log(timing);
 
 var tabId, tabUrl;
+
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+	// double check object sent is window.performance and it has a valid timing property
+	if (sender.tab && request.constructor.name = "Performance" && request.timing) { 
+		console.log(request.timing);
+	} else {
+		sendResponse({}); 
+	}
+});
+
 $(document).ready( function() {
 	// get the current tab
 	chrome.tabs.getSelected(null, function(tab) {
@@ -9,7 +23,7 @@ $(document).ready( function() {
 	});	
 	
 //	console.log(backgroundPage.pagePerformance);	
-	writeTimeline();
+// 	writeDynamicElements();
 
 });
 
@@ -20,9 +34,6 @@ function clog(val) {
 	var message = JSON.stringify(val).replace(/\n/g, " ");
 	chrome.tabs.sendRequest(tabId, {"type": "consoleLog", "value": message});	
 }
-
-
-
 
 
 
@@ -66,7 +77,7 @@ function Timeline(timelineElement, events) {
     this.fontFamily = "Consolas, sans-serif";
 	this.numTicks = 5; // number of ticks on x-axis
 	this.padding = 10; 	
-	this.width = 800; 	
+	this.width = 750; 	
 
 	$(timelineElement).css({
 		"background-color": this.backgroundColor,
@@ -129,8 +140,10 @@ function writeTimeline() {
 	// each attribute is the name of a navigation or page load event
 	// not all of which may have occurred, for example secureConnectionStart or redirectStart
 	// -- performance.timing properties aren't enumerable in IE 9.0 so Object.keys() won't work
-	for (eventName in performance.timing) {	
-		var time = parseInt(performance.timing[eventName]); 
+	// timing is defined globally
+	console.log(window.timing);
+	for (eventName in timing) {	
+		var time = parseInt(timing[eventName]); 
 		// events that did not occur have zero time
 		if (time === 0) {  
 			nonEvents.push(eventName);
@@ -207,16 +220,6 @@ function writeTimeline() {
 
 
 function writeDynamicElements(){
-//     var atts = [];
-//     var t = performance.timing;
-//     for (prop in t) {
-//        if (performance.timing.hasOwnProperty(prop)) { // doesn't work in IE9
-//             atts.push(prop + ": " + t[prop]); 
-//        }
-//     }
-//     atts.sort(); // in the console attributes are displayed in alphabetical order
-//     $("#atts").append(atts.join("<br />"));
-    
 //    $("#networkLatency").html("for this page, " + (t.responseEnd - t.fetchStart) + "ms");
 //	var pageLoadMessage = t.loadEventEnd == 0 ? 
 // 		"unable to calculate in the page, because loadEventEnd had not yet occurred" : 

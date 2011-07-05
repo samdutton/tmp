@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+
+<title>Page Visibility demo</title>
+
+<script src="js/jquery-1.6.1.js"></script>
+
+<script type="text/javascript">
+
+function pauseVideo(){
+	alert("pauseVideo");
+}
+
+function playVideo(){
+	alert("playVideo");
+}
+
+function handleVisibilityChange() {
+	if (document.webkitHidden) {
+		pauseVideo();
+	} else {
+		playVideo();
+	}
+}
+
+document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
+
+if (!document.webkitHidden) {
+	playVideo(); 
+}
+</script>
+
+<style type="text/css">
+
+</style>
+
+</head>
+
+<body>
+
+<video src="video/search.mov" />
+
+</body>
+
+</html>
