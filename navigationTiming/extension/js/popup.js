@@ -6,7 +6,8 @@
 
 var tabId, tabUrl;
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) 
+{
 	console.log(request);
 	// double check object sent is window.performance and it has a valid timing property
 	if (sender.tab && request.constructor.name = "Performance" && request.timing) { 
@@ -16,7 +17,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 	}
 });
 
-$(document).ready( function() {
+$(document).ready( function() 
+{
 	// get the current tab
 	chrome.tabs.getSelected(null, function(tab) {
 		tabId = tab.id;
@@ -34,11 +36,12 @@ $(document).ready( function() {
 
 
 
-// workaround for lack of Inspect Popup in Chrome 4 -- copes with strings and other objects
-function clog(val) {
-	var message = JSON.stringify(val).replace(/\n/g, " ");
-	chrome.tabs.sendRequest(tabId, {"type": "consoleLog", "value": message});	
-}
+// // workaround for lack of Inspect Popup in Chrome 4 -- copes with strings and other objects
+// function clog(val) 
+// {
+// 	var message = JSON.stringify(val).replace(/\n/g, " ");
+// 	chrome.tabs.sendRequest(tabId, {"type": "consoleLog", "value": message});	
+// }
 
 
 
@@ -48,7 +51,8 @@ function clog(val) {
 // Constructor arguments:
 // - timelineElement is the DOM element where the timeline will be displayed
 // - events is an array of objects that each have a time and eventName property
-function Timeline(timelineElement, events) {
+function Timeline(timelineElement, events) 
+{
 	this.events = events;
 	this.timelineElement = timelineElement;
 	// get the minimum and maximum time values
@@ -94,7 +98,8 @@ function Timeline(timelineElement, events) {
 		}); 	
  }
 
-Timeline.prototype = {
+Timeline.prototype = 
+{
 	draw: function() {
 		var i;
 		// draw event divs
@@ -137,7 +142,8 @@ Timeline.prototype = {
 // Arguments: 
 // - timelineElement: the element in which to draw the timeline
 // - timing: a performance.timing object
-function writeTimeline(timelineElement, timing) {
+function writeTimeline(timelineElement, timing) 
+{
 	// events is an array of objects, each with a time and an event name
 	// -- note that there may be more than one event for each time
 	var events = []; 
@@ -212,7 +218,7 @@ function writeTimeline(timelineElement, timing) {
 		"top": "-3px",
 		"width": tickDivWidth + "px"
 		};
-	// this is hacky and ugly but it works
+	// this is ugly but it works
 	var zeroTickDiv = $("<div>|<br />0</div>").css(tickDivCss).css({"left": -tickDivWidth / 2}); // 50 = half width
 	// get the css left value for the max tick 
 	var maxTickDivLeft = timelineObject.width - timelineObject.eventWidth - 
@@ -230,19 +236,23 @@ function writeTimeline(timelineElement, timing) {
 } // writeTimeline;
 
 
-function writeDynamicElements(performance){
-//    $("#networkLatency").html("for this page, " + (t.responseEnd - t.fetchStart) + "ms");
-//	var pageLoadMessage = t.loadEventEnd == 0 ? 
-// 		"unable to calculate in the page, because loadEventEnd had not yet occurred" : 
-//     	(t.loadEventEnd - t.responseEnd) + "ms";
-//  $("#pageLoad").html(pageLoadMessage);
-//  var soupToNutsMessage = t.loadEventEnd == 0 ? "likewise!" : 
-// 		(t.loadEventEnd - t.navigationStart) + "ms"
-//  $("#soupToNuts").html(soupToNutsMessage);
+function writeDynamicElements(performance)
+{
+	var timing = performance.timing;
 
-//     var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
-//     var howIGotHere = navigationTypes[performance.navigation.type];
-//     $("#howIGotHere").html(howIGotHere);
-    
-	writeTimeline(document.querySelector("#timeline"), performance.timing);
+	var timelineElement = document.querySelector("#timeline");
+	writeTimeline(timelineElement, performance.timing);
+	
+	if (timing.loadEventEnd === 0 || timing.respondEnd === 0 || timing.NavigationStart === 0 || 
+		!performance.navigation.type) {
+		$("#error").show();
+		$("#results").hide();
+	} else {
+		$("#networkLatency").html(timing.responseEnd - timing.fetchStart);	
+		$("#pageLoad").html(timing.loadEventEnd - timing.responseEnd);	
+		$("#soupToNuts").html(timing.loadEventEnd - timing.navigationStart);	
+		var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
+		var howIGotHere = navigationTypes[performance.navigation.type];
+		$("#howIGotHere").html(howIGotHere);    
+	}
 }
