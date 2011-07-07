@@ -1,5 +1,5 @@
-var backgroundPage = chrome.extension.getBackgroundPage();
-var timing;
+// var backgroundPage = chrome.extension.getBackgroundPage();
+// var performanceObject;
 // var timing = backgroundPage.pagePerformance.timing;
 // 	console.log("in popup");
 // console.log(timing);
@@ -7,6 +7,7 @@ var timing;
 var tabId, tabUrl;
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+	console.log(request);
 	// double check object sent is window.performance and it has a valid timing property
 	if (sender.tab && request.constructor.name = "Performance" && request.timing) { 
 		console.log(request.timing);
@@ -20,10 +21,14 @@ $(document).ready( function() {
 	chrome.tabs.getSelected(null, function(tab) {
 		tabId = tab.id;
 		tabUrl = tab.url;
+		// request the window.performance object from the contentscript
+		// write a timeline and other dynamic elements when the response is received
+		chrome.tabs.sendRequest(tabId, {"type": "sendPerformance"}, 
+			function(response){
+				writeDynamicElements(response);
+			});	
 	});	
 	
-//	console.log(backgroundPage.pagePerformance);	
-// 	writeDynamicElements();
 
 });
 
@@ -75,13 +80,15 @@ function Timeline(timelineElement, events) {
 
 	// defaults for timeline
     this.fontFamily = "Consolas, sans-serif";
+    this.fontSize = 12;
 	this.numTicks = 5; // number of ticks on x-axis
 	this.padding = 10; 	
-	this.width = 750; 	
+	this.width = 740; 	
 
 	$(timelineElement).css({
 		"background-color": this.backgroundColor,
 		"font-family": this.fontFamily,
+		"font-size": this.fontSize + "px",
         "padding": this.padding + "px",
 		"width": this.width + "px"
 		}); 	
@@ -124,8 +131,13 @@ Timeline.prototype = {
 	}
 }; // Timeline class
 
-	
-function writeTimeline() {
+
+// Use the Timeline class to draw a timeline for the attributes (events) 
+//  of a window.performance.timing object.
+// Arguments: 
+// - timelineElement: the element in which to draw the timeline
+// - timing: a performance.timing object
+function writeTimeline(timelineElement, timing) {
 	// events is an array of objects, each with a time and an event name
 	// -- note that there may be more than one event for each time
 	var events = []; 
@@ -141,7 +153,7 @@ function writeTimeline() {
 	// not all of which may have occurred, for example secureConnectionStart or redirectStart
 	// -- performance.timing properties aren't enumerable in IE 9.0 so Object.keys() won't work
 	// timing is defined globally
-	console.log(window.timing);
+//	console.log(window.timing);
 	for (eventName in timing) {	
 		var time = parseInt(timing[eventName]); 
 		// events that did not occur have zero time
@@ -179,7 +191,6 @@ function writeTimeline() {
 
 
 	// draw timeline
-	var timelineElement = document.querySelector("#timeline");	
 	var timelineObject = new Timeline(timelineElement, events);
 	timelineObject.draw();
 
@@ -219,7 +230,7 @@ function writeTimeline() {
 } // writeTimeline;
 
 
-function writeDynamicElements(){
+function writeDynamicElements(performance){
 //    $("#networkLatency").html("for this page, " + (t.responseEnd - t.fetchStart) + "ms");
 //	var pageLoadMessage = t.loadEventEnd == 0 ? 
 // 		"unable to calculate in the page, because loadEventEnd had not yet occurred" : 
@@ -233,5 +244,5 @@ function writeDynamicElements(){
 //     var howIGotHere = navigationTypes[performance.navigation.type];
 //     $("#howIGotHere").html(howIGotHere);
     
-	writeTimeline();
+	writeTimeline(document.querySelector("#timeline"), performance.timing);
 }

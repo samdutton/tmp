@@ -11,28 +11,28 @@
 
 <body>
 
-<!-- <Audio src="Audio/search.mov" autoplay /> -->
-<audio id="audioElement" src="audio/tearsOfJoy.m4a" autoplay controls />
+<!-- <Video src="Video/search.mov" autoplay /> -->
+<video id="videoElement" src="video/dizzy.mp4" autoplay controls />
 
 <script src="js/jquery-1.6.1.js"></script>
 
 <script type="text/javascript">
 
-function pauseAudio(){
-	console.log("pauseAudio");
-	document.getElementById("audioElement").pause();
+function pauseVideo(){
+	console.log("pauseVideo");
+	document.getElementById("videoElement").pause();
 }
 
-function playAudio(){
-	console.log("playAudio");
-	document.getElementById("audioElement").play();
+function playVideo(){
+	console.log("playVideo");
+	document.getElementById("videoElement").play();
 }
 
 function handleVisibilityChange() {
 	if (document.webkitHidden) {
-		pauseAudio();
+		pauseVideo();
 	} else {
-		playAudio();
+		playVideo();
 	}
 }
 
@@ -40,7 +40,7 @@ document.addEventListener("webkitvisibilitychange", handleVisibilityChange, fals
 
 // if document doesn't support webkitHidden
 if (!document.webkitHidden) {
-	playAudio(); 
+	playVideo(); 
 }
 </script>
 
