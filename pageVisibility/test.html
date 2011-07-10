@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+
+<title></title>
+
+<link id="favicon" rel="shortcut icon" type="image/png" href="images/playing.png" />
+
+
+<script src="js/jquery-1.6.1.js"></script>
+
+<script type="text/javascript">
+function changeFavicon() {
+	$("#favicon").attr("href","images/paused.png");
+}
+
+$(document).ready(function(){
+	$("#button").click(function(){
+		changeFavicon();
+	});
+});
+</script>
+
+<style type="text/css">
+
+</style>
+
+</head>
+
+<body>
+
+<input type="button" id="button">
+
+</body>
+
+</html>

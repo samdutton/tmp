@@ -86,7 +86,7 @@ function Timeline(timelineElement, events)
     this.fontFamily = "Consolas, sans-serif";
     this.fontSize = 12;
 	this.numTicks = 5; // number of ticks on x-axis
-	this.padding = 10; 	
+	this.padding = 5; 	
 	this.width = 740; 	
 
 	$(timelineElement).css({
@@ -243,15 +243,16 @@ function writeDynamicElements(performance)
 	var timelineElement = document.querySelector("#timeline");
 	writeTimeline(timelineElement, performance.timing);
 	
-	if (timing.loadEventEnd === 0 || timing.respondEnd === 0 || timing.NavigationStart === 0 || 
-		!performance.navigation.type) {
-		$("#error").show();
+	if (timing.loadEventEnd === 0 || timing.responseEnd === 0 || timing.navigationStart === 0 || 
+		performance.navigation.type < 0) {
 		$("#results").hide();
 	} else {
 		$("#networkLatency").html(timing.responseEnd - timing.fetchStart);	
 		$("#pageLoad").html(timing.loadEventEnd - timing.responseEnd);	
 		$("#soupToNuts").html(timing.loadEventEnd - timing.navigationStart);	
 		var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
+		// performance.navigation.type is an enumeration
+		console.log(performance.navigation.type);
 		var howIGotHere = navigationTypes[performance.navigation.type];
 		$("#howIGotHere").html(howIGotHere);    
 	}
