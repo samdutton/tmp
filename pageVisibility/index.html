@@ -12,8 +12,8 @@
 <body>
 
 <video id="videoElement" autoplay controls >
-	<source src="video/dizzy.mp4" />
-	<source src="video/video.ogv" />
+	<source src="video/dizzy.mp4" type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'" />
+	<source src="video/video.ogv" type="video/ogg" />
 </video>
 
 <script src="js/jquery-1.6.1.js"></script>
@@ -36,7 +36,6 @@ function handleVisibilityChange() {
 // if document doesn't support webkitHidden
 if (typeof document.webkitHidden === "undefined") {
 	alert("This demo requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
-	videoElement.play(); 
 } else {
 // handle page visibility change
 // see https://developer.mozilla.org/en/API/PageVisibility/Page_Visibility_API
