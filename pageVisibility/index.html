@@ -11,7 +11,6 @@
 
 <body>
 
-<!-- <Video src="Video/search.mov" autoplay /> -->
 <video id="videoElement" src="video/dizzy.mp4" autoplay controls />
 
 <script src="js/jquery-1.6.1.js"></script>
@@ -19,34 +18,39 @@
 
 <script type="text/javascript">
 
-function pauseVideo(){
-	console.log("pauseVideo");
- 	favicon.change('images/paused.png');
-// 	favicon.change('http://www.google.com/favicon.ico');
-	document.getElementById("videoElement").pause();
-}
+var videoElement = document.getElementById("videoElement");
 
-function playVideo(){
-	console.log("playVideo");
- 	favicon.change('images/playing.png');
-//	favicon.change('http://www.amazon.com/favicon.ico');
-	document.getElementById("videoElement").play();
-}
-
+// if the page is hidden, pause the video and change the icon
+// if the page is shown, start playing and change the icon
 function handleVisibilityChange() {
 	if (document.webkitHidden) {
-		pauseVideo();
+		videoElement.pause();
 	} else {
-		playVideo();
+		videoElement.play();
 	}
 }
 
-document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
+document.addEventListener("webkitvisibilitychange", 
+	handleVisibilityChange, false);
+
+videoElement.addEventListener("pause", function(){
+		favicon.change('images/paused.png');
+	}, false);
+
+videoElement.addEventListener("play", function(){
+		favicon.change('images/playing.png');
+	}, false);
+
+videoElement.addEventListener("timeupdate", function(){
+		document.title = "Page Visibility: " + 
+			Math.floor(videoElement.currentTime);
+	}, false);
 
 // if document doesn't support webkitHidden
-if (!document.webkitHidden) {
-	playVideo(); 
-}
+// if (!document.webkitHidden) {
+// 	alert("This browser does not support the Page Visibility API");
+// 	videoElement.play(); 
+// }
 </script>
 
 </body>
