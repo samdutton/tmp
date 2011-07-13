@@ -5,34 +5,48 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
 
-<title></title>
-
-<link id="favicon" rel="shortcut icon" type="image/png" href="images/playing.png" />
-
-
-<script src="js/jquery-1.6.1.js"></script>
-
-<script type="text/javascript">
-function changeFavicon() {
-	$("#favicon").attr("href","images/paused.png");
-}
-
-$(document).ready(function(){
-	$("#button").click(function(){
-		changeFavicon();
-	});
-});
-</script>
-
-<style type="text/css">
-
-</style>
+<title>Page Visibility demo</title>
 
 </head>
 
 <body>
 
-<input type="button" id="button">
+<!-- <Video src="Video/search.mov" autoplay /> -->
+<video id="videoElement" src="video/dizzy.mp4" autoplay controls />
+
+<script src="js/jquery-1.6.1.js"></script>
+<script src="js/favicon.js"></script>
+
+<script type="text/javascript">
+
+
+function pauseVideo(){
+	console.log("pauseVideo");
+	changeFavicon('images/paused.png');
+	document.getElementById("videoElement").pause();
+}
+
+function playVideo(){
+	console.log("playVideo");
+	changeFavicon('images/playing.png');
+	document.getElementById("videoElement").play();
+}
+
+function handleVisibilityChange() {
+	if (document.webkitHidden) {
+		pauseVideo();
+	} else {
+		playVideo();
+	}
+}
+
+document.addEventListener("webkitvisibilitychange", handleVisibilityChange, false);
+
+// if document doesn't support webkitHidden
+if (!document.webkitHidden) {
+	playVideo(); 
+}
+</script>
 
 </body>
 

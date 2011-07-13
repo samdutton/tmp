@@ -15,16 +15,21 @@
 <video id="videoElement" src="video/dizzy.mp4" autoplay controls />
 
 <script src="js/jquery-1.6.1.js"></script>
+<script src="js/favicon.js"></script>
 
 <script type="text/javascript">
 
 function pauseVideo(){
 	console.log("pauseVideo");
+ 	favicon.change('images/paused.png');
+// 	favicon.change('http://www.google.com/favicon.ico');
 	document.getElementById("videoElement").pause();
 }
 
 function playVideo(){
 	console.log("playVideo");
+ 	favicon.change('images/playing.png');
+//	favicon.change('http://www.amazon.com/favicon.ico');
 	document.getElementById("videoElement").play();
 }
 
