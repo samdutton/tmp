@@ -15,12 +15,22 @@
 
 <style type="text/css">
 body {
-	background-color: #eee;
+	background-color: #fff;
 	font-family: Consolas, sans-serif;
 	font-size: 12px;
 	margin: 0;
 	padding: 5px;
 }
+div#dataNotAvailable {
+	width: 300px;
+}
+div#results {
+	border-top: 1px dotted #ccc;
+	display: none;
+	margin: 5px 0 0 0;
+}
+
+
 </style>
 
 </head>
@@ -31,11 +41,17 @@ body {
 
 <div id="timeline"></div>
 
+<!-- displayed if performance.timing data is available for the current page -->
 <div id="results">
 	<p>You got to this page by <span id="howIGotHere"></span>.</p>	
 	<p>Network latency was <span id="networkLatency"></span>ms (responseEnd - fetchStart).</p>
 	<p>The page took <span id="pageLoad"></span>ms to load after it was received from the server (loadEventEnd - responseEnd).</p>
 	<p>Navigation and page load took a total of <span id="soupToNuts"></span>ms (loadEventEnd - navigationStart).</p>
+</div>
+
+<!-- displayed if performance.timing data is not available -->
+<div id="dataNotAvailable">
+<p><em>performance.timing</em> data is not available for this page.</p>
 </div>
 
 </div> <!-- container -->

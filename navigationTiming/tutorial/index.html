@@ -264,7 +264,7 @@ height: 1px;
 
 <p style="font-weight:bold;"><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html" title="W3C Navigation Timing Editor's Draft">Navigation Timing</a> is a native JavaScript API for accurately measuring page load speed.</p>
 
-<p style="border-bottom: 1px solid #444; font-weight:bold; padding-bottom: 1em;">Below is a quick-start guide to the API and some ideas of how to use it.</p>
+<p style="border-bottom: 1px solid #444; font-weight:bold; padding-bottom: 1em;">Below is a guide to the API and some ideas of how to use it.</p>
 
 <!-- warning paragraph for browsers that do not support Navigation Timing -->
 <script type="text/javascript">
@@ -277,31 +277,32 @@ if (!isWindowPerformanceSupported) {
 
 <p>But now do we measure web page load speed? And what does "page load" actually mean?</p>
 
-<p>The Navigation Timing API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading.  It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and in <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a> version 6 and above. A <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=570341" title="Mozilla bug report" target="_blank">Firefox implementation</a> has been completed and is expected to be incorporated in version 6.</p>
+<p>The Navigation Timing API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading.  It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a> version 6 and above. A <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=570341" title="Mozilla bug report" target="_blank">Firefox implementation</a> has been completed and is expected to be incorporated in version 6.</p>
 
-<p>The API is accessed via the <em>window.performance</em> object, which has three properties:</p>
+<p>The API is accessed via the <em>window.performance</em> object, which has the following properties:</p>
 
 <ul>
-    <li>memory</li>
     <li>navigation</li>
     <li>timing</li>
 </ul>
+
+<p>Chrome also provides a <code>perfomance.memory</code> property which gives access to JavaScript memory usage data.</p>
+
+<p>The simplest way to try out the API is to take a look at the window.performance object in your browser's developer tools JavaScript console.</p>
+
+<p>For example, from any web page in <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a>:</p>
+<ol>
+	<li>Select <strong>Tools > JavaScript console</strong> from the wrench (spanner) menu at the top right of the Chrome window (or press <strong>Ctrl-Shift-J</strong> on Windows and Linux, or <strong> Command-Option-J</strong> on a Mac).</li>
+	<li>Type in the word <em>performance</em> next to the > prompt at the bottom of the window and press return.</li>
+	<li>Click <strong>Performance</strong> to see the properties of the object: memory, navigation and timing.</li>
+	<li>Click the arrow to the left of timing to see its properties.</li>
+</ol>
 
 <p>To use the API in <a href="http://www.beautyoftheweb.com/" title="Internet Explorer 9 home page">Internet Explorer 9</a>:</p> 
 <ul>
     <li>On a web page, use the <code>&lt;!doctype html&gt;</code> directive to ensure the document is displayed in <a href="http://msdn.microsoft.com/en-us/library/cc288325" title="MSDN: Defining Document Compatibility">Internet Explorer 9 mode</a></li>
     <li>In the Internet Explorer developer tools console, you may need to adjust the browser or document mode.</li>
 </ul>
-
-<p>The simplest way to try out the API is to take a look at the window.performance object in your browser's developer tools JavaScript console.</p>
-
-<p>For example, from any web page in <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a>:</p>
-<ol>
-	<li>Select <strong>Tools > JavaScript console</strong> from the wrench (spanner) menu at the top right of the Chrome window (or press <em>Ctrl-Shift-J</em> on Windows and Linux, or <strong> Command-Option-J</strong> on a Mac).</li>
-	<li>Type in the word <em>performance</em> next to the > prompt at the bottom of the window and press return.</li>
-	<li>Click <strong>Performance</strong> to see the properties of the object: memory, navigation and timing.</li>
-	<li>Click the arrow to the left of timing to see its properties.</li>
-</ol>
 
 <p>You should see something like the following (which has been generated dynamically with code on this page):</p>
 
@@ -312,9 +313,7 @@ if (!isWindowPerformanceSupported) {
 
 <p>Each performance.timing attribute shows the time of a navigation or page load event, measured in milliseconds since midnight of January 1, 1970 (UTC). A zero value means that an event (such as <code>secureConnectionStart</code> or <code>redirectStart</code>) did not occur.</p>
 
-<p>These meaning of these events is described in Microsoft's <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">performance.timing documentation</a> and more formally in the <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">W3C Editor's Draft</a>.</p>
-
-<p>Internet Explorer 9 supports all the attributes described in the API draft except <code>secureConnectionStart</code>, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank"><code>msFirstPaint</code></a> event which occurs when document display begins, after <code>loadEventEnd</code>.</p>
+<p>The meaning of these events is described in Microsoft's <a href="http://msdn.microsoft.com/en-us/library/ff975075" title="MSDN: peformanceTiming members table" target="_blank">performance.timing documentation</a> and more formally in the <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#sec-navigation-timing-interface" title="W3C PerformanceTiming interface documentation" target="_blank">W3C Editor's Draft</a>. Internet Explorer 9 supports all the attributes described in the API draft except <code>secureConnectionStart</code>, and in addition provides the <a href="http://msdn.microsoft.com/en-us/library/ff974719" title="MSDN: msFirstPaint Property documentation" target="_blank"><code>msFirstPaint</code></a> event which occurs when document display begins, after <code>loadEventEnd</code>.</p>
 
 <p>You can combine the timing information provided by the API in many ways, such as the following:</p>
 <ul>
@@ -333,9 +332,9 @@ if (!isWindowPerformanceSupported) {
 
 <div><a href="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model" title="Navigation Timing Processing Model"><img src="http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/timing-overview.png" title="Navigation timing overview" style="width: 100%" /></a></div>
 
-<h2>What's wrong with the JavaScript Date object?</h2>
+<h2>What's wrong with using the JavaScript Date object?</h2>
 
-<p>Web developers and test suites like <a href="http://www2.webkit.org/perf/sunspider-0.9/sunspider.html" title="SunSpider JavaScript Benchmark" target="_blank">SunSpider</a> and <a href="http://dromaeo.com/" title="Dromaeo performance testing" target="_blank">Dromaeo</a>, use the JavaScript Date object for timing metrics. A simple speed test might use code at the start of a web page like this:</p>
+<p>Web developers and test suites use the JavaScript Date object for timing metrics. A simple speed test might use code at the start of a web page like this:</p>
 
 <div>
     <code class="block">
@@ -356,10 +355,18 @@ console.log("Page load took " + (Date.now() - start) + "milliseconds");
 <ul>
 	<li>The timing code is in the page, so it causes an <a href="http://en.wikipedia.org/wiki/Observer_effect_(information_technology)" title="Wikipedia article: Observer effect (information technology)" target="_blank">observer effect</a>, changing how the page loads and the time that takes.</li>
 	<li>JavaScript time is <a href="http://ejohn.org/blog/accuracy-of-javascript-time/" title="John Resig: Accuracy of JavaScript Time" target="_blank">not accurate</a>.</li>
-	<li>Unless you're happy to leave timing code in a page, you won't be able to measure load speeds in the wild.</li>
+	<li>Unless you're happy to leave timing code in a page, you won't be able to measure load speeds as experienced by your users.</li>
 </ul>
 
 <p>Worst of all, the in-the-page approach can't measure the total latency users experience when they "open a page", whether they click on a link or enter a URL in the address bar of their browser. This is because that latency includes processes such as DNS resolution, redirects and server response, which occur before page content (and JavaScript timing code) loads. It is possible to use cookies to measure the time taken between the unloading of one page, and loading of the next, but only if you host both pages. Using the cookie method won't work when a user first visits your website &ndash; which is probably the most important performance measurement &ndash; and can only give a total figure for network latency, without breaking down the data to give specific information about redirection or DNS delays, for example.</p>
+
+<p>Below is a timeline of all the performance.timing events that occurred in navigating to this page and loading its content, normalised to start from zero.</p>
+
+<p>Hover the cursor over each item to see the exact event time.</p>
+
+<div id="timeline"></div>
+
+<p>Note that <code>loadEventEnd</code> and <code>domComplete</code> events did not occur in this case, because the page was still being loaded when the timeline was rendered!</p>
 
 <h2>How did I get here?</h2>
 
@@ -379,21 +386,13 @@ console.log("Page load took " + (Date.now() - start) + "milliseconds");
 
 <p>You got to this page by <span id="howIGotHere"></span>.</p>
 
-<p>Below is a timeline of all the performance.timing events that occurred in navigating to this page and loading its content, normalised to start from zero.</p>
-
-<p>Hover the cursor over each item to see the exact event time.</p>
-
-<div id="timeline"></div>
-
-<p>Note that <code>loadEventEnd</code> and <code>domComplete</code> events don't occur, because the page is still being loaded when the timeline is rendered!</p>
-
-<p>Visualisations of data from the API are also available from the <a href="">Navigation Timing extension</a>, which charts current and historical data for any page.</p>
-
-<h2>What's it all for?</h2>
+<h2>...and where are we going?</h2>
 
 <p>Navigation Timing gives developers useful tools, but the API's most compelling use case is web analytics, for which it provides rich, accurate and non-intrusive reporting.</p>
 
 <p>Better reporting helps us understand page load latency. That should lead to more efficient websites and infrastructure, faster web applications, and a better experience on the web.</p>
+
+<p>To view data for websites you visit, you may also want to try the <a href="">Navigation Timing extension</a>, which provides visualisations of performance timing and navigation data for any page.</p>
 
 </body>
 

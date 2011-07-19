@@ -1,21 +1,4 @@
-// var backgroundPage = chrome.extension.getBackgroundPage();
-// var performanceObject;
-// var timing = backgroundPage.pagePerformance.timing;
-// 	console.log("in popup");
-// console.log(timing);
-
 var tabId, tabUrl;
-
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) 
-{
-	console.log(request);
-	// double check object sent is window.performance and it has a valid timing property
-	if (sender.tab && request.constructor.name = "Performance" && request.timing) { 
-		console.log(request.timing);
-	} else {
-		sendResponse({}); 
-	}
-});
 
 $(document).ready( function() 
 {
@@ -25,25 +8,16 @@ $(document).ready( function()
 		tabUrl = tab.url;
 		// request the window.performance object from the contentscript
 		// write a timeline and other dynamic elements when the response is received
+		// note that this request will only be processed if the current page
+		// is of a type that can accept a content script, 
+		// i.e not pages such as chrome://extensions
+		// -- for these pages, popup.html has div#dataNotAvailable 
 		chrome.tabs.sendRequest(tabId, {"type": "sendPerformance"}, 
 			function(response){
 				writeDynamicElements(response);
 			});	
-	});	
-	
-
+	});		
 });
-
-
-
-// // workaround for lack of Inspect Popup in Chrome 4 -- copes with strings and other objects
-// function clog(val) 
-// {
-// 	var message = JSON.stringify(val).replace(/\n/g, " ");
-// 	chrome.tabs.sendRequest(tabId, {"type": "consoleLog", "value": message});	
-// }
-
-
 
 
 // Timeline class used for div#timeline chart.
@@ -70,8 +44,8 @@ function Timeline(timelineElement, events)
 
 	// defaults for event name display
 	// could easily be refactored to make these values customisable
-    this.backgroundColor = "#eee"; 
-    this.eventBorderLeftColor = "#080"; 
+    this.backgroundColor = "#fff"; 
+    this.eventBorderLeftColor = "#d14c32"; 
     this.eventBorderLeftStyle = "solid"; 
     this.eventBorderLeftWidth = 2; 
     this.eventColor = "#666"; 
@@ -128,7 +102,7 @@ Timeline.prototype =
 		// draw timeline x-axis ticks and labels
 		var xAxisDiv = $("<div />");
 		xAxisDiv.css({
-			"border-top": "1px solid #ccc" // the actual x-axis
+			"border-top": "1px solid #508bff" // the displayed x-axis
 		});
 		$(this.timeElement).append(xAxisDiv);
 		
@@ -158,8 +132,6 @@ function writeTimeline(timelineElement, timing)
 	// each attribute is the name of a navigation or page load event
 	// not all of which may have occurred, for example secureConnectionStart or redirectStart
 	// -- performance.timing properties aren't enumerable in IE 9.0 so Object.keys() won't work
-	// timing is defined globally
-//	console.log(window.timing);
 	for (eventName in timing) {	
 		var time = parseInt(timing[eventName]); 
 		// events that did not occur have zero time
@@ -203,26 +175,26 @@ function writeTimeline(timelineElement, timing)
 	// draw basic timeline x-axis ticks and labels
 	var xAxisDiv = $("<div />");
 		xAxisDiv.css({
-		"border-top": "1px solid #060", // the actual x-axis
+		"border-top": "1px solid #508bff", // the displayed x-axis
 		"height": "40px",
-		"margin": "10px 0 20px 0",
+		"margin": "10px 0 0 0",
 		"position": "relative"
 	});	
 	
 	// add ticks to the x-axis: for zero and for the maximum time, timelineObject.maxTime
 	var tickDivWidth = 100;
 	var tickDivCss = {
-		"color": "#060",
+		"color": "#508bff",
 		"position": "absolute", 
 		"text-align": "center",
 		"top": "-3px",
 		"width": tickDivWidth + "px"
 		};
-	// this is ugly but it works
+	// this is ugly but it works!
 	var zeroTickDiv = $("<div>|<br />0</div>").css(tickDivCss).css({"left": -tickDivWidth / 2}); // 50 = half width
 	// get the css left value for the max tick 
 	var maxTickDivLeft = timelineObject.width - timelineObject.eventWidth - 
-		timelineObject.eventPadding - timelineObject.eventBorderLeftWidth - (tickDivWidth / 2); 
+		timelineObject.eventPadding - timelineObject.eventBorderLeftWidth - (tickDivWidth / 2) + 1; 
 	var maxTickDiv = $("<div>|<br />" + timelineObject.maxTime + "ms</div>").css(tickDivCss).
 		css({"left": maxTickDivLeft});
 	xAxisDiv.append(zeroTickDiv).append(maxTickDiv);
@@ -235,24 +207,29 @@ function writeTimeline(timelineElement, timing)
 
 } // writeTimeline;
 
-
+// Display the timeline and write data for page load speed and network latency.
+// Note that this callback function (called from contentscript.js) will only 
+// be called for pages that support content scripts. 
+// For pages such as those with chrome: URLs, which do not support content
+// scripts, div#dataNotAvailable is displayed in popup.html.
 function writeDynamicElements(performance)
-{
-	var timing = performance.timing;
+{ 
+	$("div#dataNotAvailable").hide();
 
+	var timing = performance.timing;
+	
 	var timelineElement = document.querySelector("#timeline");
-	writeTimeline(timelineElement, performance.timing);
+	writeTimeline(timelineElement, timing);
 	
 	if (timing.loadEventEnd === 0 || timing.responseEnd === 0 || timing.navigationStart === 0 || 
 		performance.navigation.type < 0) {
-		$("#results").hide();
 	} else {
+		$("#results").show();
 		$("#networkLatency").html(timing.responseEnd - timing.fetchStart);	
 		$("#pageLoad").html(timing.loadEventEnd - timing.responseEnd);	
 		$("#soupToNuts").html(timing.loadEventEnd - timing.navigationStart);	
 		var navigationTypes = ["clicking a link or entering a URL", "reload", "navigating through history"];    
 		// performance.navigation.type is an enumeration
-		console.log(performance.navigation.type);
 		var howIGotHere = navigationTypes[performance.navigation.type];
 		$("#howIGotHere").html(howIGotHere);    
 	}
