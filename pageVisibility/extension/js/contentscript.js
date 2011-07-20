@@ -1,8 +1,22 @@
-console.log("beginning of script: " + $("embed[type='application/x-shockwave-flash']").length);
+var flashVideos = $("embed[type='application/x-shockwave-flash']";
+var htmlVideos = $("video");
 
-$(document).ready( function() {
-	console.log("document ready: " + $("embed[type='application/x-shockwave-flash']").length);
-});
+// if page not visible
+// - for each video
+// -- set boolean wasPlaying attribute
+// -- pause
+
+// when page visibility changes
+// if page now hidden
+// - for each video
+// -- check if it was playing
+// -- set boolean wasPlaying attribute
+// -- pause
+// if page now displayed
+// - for each video
+// -- if wasPlaying
+// --- play
+
 
 chrome.extension.onRequest.addListener(
 	function(request, sender, sendResponse) {
@@ -17,6 +31,3 @@ chrome.extension.onRequest.addListener(
 	}
 );
 
-
-// embed src="http://www.youtube.com/v/DH8evFsexXo" type="application/x-shockwave-flash"
-// <embed type="application/x-shockwave-flash" src="http://s.ytimg.com/yt/swfbin/watch_as3-vflYi8Mkr.swf"
