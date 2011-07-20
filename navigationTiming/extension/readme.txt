@@ -1,17 +1,23 @@
-WYSIWYP
+Navigation Timing
 
-A Chrome extension for 'what you see is what you get' printing of Google Maps.
+Display page load timing and navigation data, using the JavaScript window.performance API.
 
 .......................
 
-How to use WYSIWYP
+How to use the extension
 
+This extension will work on any web page that supports content scripts. Simply install the extension and then click on the extension icon to view a visualisation of page load timing and navigation data.
 
+This extension will not work on pages that do not support content scripts, such as those with a chrome: URL. 
 
 
 How does it work?
 
-I don't know.
+This extension uses the timing and navigation properties of the window.performance object.
+
+For more information, see the W3C Navigation Timing Editor's Draft: 
+
+https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html
 
 
 Feedback
