@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+<title>The Framegrabber Chrome extension</title>
+
+<style type="text/css">
+a {
+color: #6699ff;
+text-decoration: none;
+}
+
+a:hover {
+color: #99aaff;
+text-decoration: underline;
+}
+
+body {
+background: #666;
+font-family: Arial, sans-serif;
+padding: 50px;
+}
+
+div#container {
+background: #000;
+margin: 0 auto 0 auto;
+padding: 20px 30px 30px 30px;
+width: 600px;
+}
+
+* html div#container {
+width: 540px;
+}
+
+h1 {
+border-bottom: 1px solid #aaa;
+color: white;
+font-family: Arial, sans-serif;
+margin: 0 0 30px 0;
+padding: 0 0 10px 0;
+}
+
+h2 {
+color: white;
+font-family: Arial, sans-serif;
+margin: 30px 0 0 0;
+}
+
+img {
+border: none;
+}
+
+p {
+color: #eee;
+font-size: 14px;
+line-height: 1.5em;
+}
+
+p.borderBottom {
+border-bottom: 1px dotted #666;
+padding: 0 0 30px 0;
+}
+
+ul {
+color: #eee;
+font-size: 14px;
+line-height: 1.5em;
+margin: 20px;
+padding: 0;
+}
+
+li {
+list-style: square;
+margin: 0 0 5px 0;
+}
+
+</style>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+});
+</script>
+
+<script type="text/javascript">
+
+</script>
+
+</head>
+
+<body>
+
+<div id="container">
+
+<h1>Navigation Timing extension</h1>
+
+<p>Display page load timing and navigation data using the JavaScript <em>window.performance</em> API.</p>
+
+
+<h2>How to use the extension</h2>
+
+<p>This extension will work on any web page that supports content scripts.</p>
+
+<p>Install the extension and then click on the extension icon to view a visualisation of page load timing and navigation data.</p>
+
+<p>This extension will not work on pages that do not support content scripts, such as those with a chrome: URL.</p>
+
+
+<h2>How does it work?</h2> 
+
+<p>This extension uses the <em>timing</em> and <em>navigation</em> properties of the <em>window.performance</em> object.</p>
+
+<p>For more information, see the W3C Navigation Timing <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html">Editor's Draft.</a></p>
+
+
+<h2 id="feedback">Feedback</h2>
+
+<p>Please send bug reports, comments or feature requests to <a href="mailto:samdutton@gmail.com">samdutton@gmail.com</a>.</p>
+
+<p>For more information, please visit my website <a href="mailto:samdutton@gmail.com">samdutton.com</a> or my blog at <a href="http://samdutton.wordpress.com">samdutton.wordpress.com</a>.</p>
+
+
+
+</div><!-- container -->
+
+</body>
+
+</html>

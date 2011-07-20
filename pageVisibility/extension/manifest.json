@@ -1,12 +1,12 @@
 {
-	"name" : "Navigation Timing",
-	"version" : "1.1",
-	"description" : "Display a timeline of navigation and page load events for the current page.",
+	"name" : "Pause That Video!",
+	"version" : "1.0",
+	"description" : "Pause video when it's not visible. Useful when you move tabs or open a video link in a new tab.",
 	"background_page" : "background.html",
 	"browser_action" : {
 		"default_icon" : "images/22.png",
 		"popup" : "popup.html",
-		"default_title" : "Click to view a timeline of navigation and page load events for the current page"
+		"default_title" : ""
 	},
 	"content_scripts" : [
 		{
@@ -16,7 +16,7 @@
 			],
 	
 		"css" : ["css/injected.css"],
-		"js" : ["js/jquery-1.6.1.js", "js/jquery.url.js", "js/contentscript.js"],
+		"js" : ["js/jquery-1.6.1.js", "js/contentscript.js"],
 		"run_at" : "document_end",
 		"all_frames" : false
 		}

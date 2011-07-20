@@ -19,16 +19,20 @@
 <h1>Using the Page Visibility API</h1>
 
 <video id="videoElement" autoplay controls style="width: 480px; height: 270px">
+	<source src="video/chrome.webm" type="video/webm" />
+	<source src="video/chrome.ogv" type="video/ogg" />
 	<source src="video/chrome.mp4" type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'" />
 </video>
 
 <p>This page demonstrates the <a href="http://code.google.com/chrome/whitepapers/pagevisibility.html">Page Visibility API</a>.</p>
 
-<p>The API can be used to check when a web page is visible to the user or not.</p>
+<p>The API can be used to check when a web page is visible or not.</p>
 
 <p>If you minimise this page or move to another tab, JavaScript in the page detects a <em>webkitvisibilitychange</em> event. The video will stop playing and the page title will stop changing &ndash; and vice versa if you return to the page.</p>
 
-<p><strong>Please note: this example requires a browser such as Google Chrome 13 that supports the Page Visibility API.</strong></p>
+<p><strong>Please note: this example requires a browser such as <a href="http://www.chromium.org/getting-involved/dev-channel" title="Google Chrome downloads">Google Chrome 13</a> that supports the Page Visibility API.</strong></p>
+
+<p>For more information, please see my blog at <a href="http://samdutton.wordpress.com/2011/07/15/the-page-visibility-api/" title="Sam Dutton's blog">samdutton.wordpress.com</a></p>
 
 <script type="text/javascript">
 
@@ -44,12 +48,13 @@ function handleVisibilityChange() {
 	}
 }
 
-// check that the browser supports document.webkitHidden
-// -- this has the side effect of avoiding error messages in 
-// browsers that don't support addEventListener
+// warn if the browser doesn't support document.webkitHidden
 if (typeof document.webkitHidden === "undefined") {
 	alert("This demo requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
-} else {
+} 
+
+// avoid errors from browsers that don't support addEventListener
+if (typeof document.addEventListener !== "undefined") {
     // handle page visibility change
     // see https://developer.mozilla.org/en/API/PageVisibility/Page_Visibility_API
     document.addEventListener("webkitvisibilitychange",  handleVisibilityChange, false);
@@ -72,7 +77,7 @@ if (typeof document.webkitHidden === "undefined") {
     
     // set the document (tab) title from the current video time
     videoElement.addEventListener("timeupdate", function(){
-		document.title = Math.floor(videoElement.currentTime) + " seconds";
+		document.title = Math.floor(videoElement.currentTime) + " second(s)";
 	}, false);
 }
 
