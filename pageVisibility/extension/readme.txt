@@ -1,4 +1,4 @@
-Pause that video!
+Hold It!
 
 Automatically pause video that's not visible. 
 
@@ -7,7 +7,7 @@ For example, when you:
 - move to a different tab
 - open a video link in a different tab.
 
-Very useful when opening lots of YouTube links in new tabs.
+Useful when opening lots of YouTube links in new tabs!
 
 .......................
 

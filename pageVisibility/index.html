@@ -62,17 +62,17 @@ if (typeof document.addEventListener !== "undefined") {
     // revert to existing favicon for site when the page is closed
     // otherwise the favicon will remain as paused.png
     window.addEventListener("unload", function(){
-		favicon.change('/favicon.ico');
+		favicon.change("/favicon.ico");
 	}, false);
     
     // when the video pauses, set the favicon
     videoElement.addEventListener("pause", function(){
-        favicon.change('images/paused.png');
+        favicon.change("images/paused.png");
 	}, false);
     
     // when the video plays, set the favicon
     videoElement.addEventListener("play", function(){
-		favicon.change('images/playing.png');
+		favicon.change("images/playing.png");
 	}, false);
     
     // set the document (tab) title from the current video time
