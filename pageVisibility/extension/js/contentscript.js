@@ -39,9 +39,7 @@ htmlVideos.each(function(index, videoElement)
 var flashVideos = $("embed[type='application/x-shockwave-flash']");
 flashVideos.each(function(index, flashVideo)
 {	
-	console.log("flashVideo");
 	if (document.webkitVisibilityState === "hidden") {
-		console.log("hidden");
 		// this is nasty, but it works and I can't think of a better way :(
 		// if you have a better idea, please email me at samdutton@gmail.com!
 		var intervalId = setInterval(function(){
@@ -91,9 +89,14 @@ function handleVisibilityChange() {
 			videoElement.pause();
 		});
 		flashVideos.each(function(index, flashVideo){
-			console.log("in handleVisibilityChange");
-			flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
-			flashVideo.pauseVideo();
+			// yuk! see note above
+			var intervalId = setInterval(function(){
+				if (flashVideo.getPlayerState) {
+					flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
+					flashVideo.pauseVideo();
+					clearInterval(intervalId);
+				}
+			});        
 		});
 	// if the page is now displayed, 
 	// play videos that were playing before the page was hidden
@@ -104,9 +107,15 @@ function handleVisibilityChange() {
 			}
 		});
 		flashVideos.each(function(index, flashVideo){
-			if (flashVideo.wasPlaying === true) {
-				flashVideo.playVideo();
-			}
+			// yuk! see note above
+			var intervalId = setInterval(function(){
+				if (flashVideo.getPlayerState) {
+					if (flashVideo.wasPlaying === true) {
+							flashVideo.playVideo();
+					}
+					clearInterval(intervalId);
+				}
+			});        
 		});
 	}
 }
