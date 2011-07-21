@@ -7,7 +7,12 @@ function resetFavicon() {
 
 // set event listeners for html video elements
 var htmlVideos = $("video");
-htmlVideos.each(function(index, videoElement){
+htmlVideos.each(function(index, videoElement)
+{
+	if (document.webkitVisibilityState === "hidden") {
+		videoElement.pause();
+	}
+	
 	// when the video pauses, set the favicon
     videoElement.addEventListener("pause", function(){
         favicon.change(chrome.extension.getURL("images/paused.png"));
@@ -32,7 +37,23 @@ htmlVideos.each(function(index, videoElement){
 
 // set event listeners for flash videos
 var flashVideos = $("embed[type='application/x-shockwave-flash']");
-flashVideos.each(function(index, flashVideo){
+flashVideos.each(function(index, flashVideo)
+{	
+	console.log("flashVideo");
+	if (document.webkitVisibilityState === "hidden") {
+		console.log("hidden");
+		// this is nasty, but it works and I can't think of a better way :(
+		// if you have a better idea, please email me at samdutton@gmail.com!
+		var intervalId = setInterval(function(){
+			if (flashVideo.getPlayerState) {
+				flashVideo.wasPlaying = flashVideo.getPlayerState() === 1; // playing
+				flashVideo.pauseVideo();
+				console.log("paused");
+				clearInterval(intervalId);
+			}
+		});
+	}
+	
 	// when the video pauses, set the favicon
     flashVideo.addEventListener("onStateChange", function(newState){
 		switch(newState) {
@@ -53,9 +74,9 @@ flashVideos.each(function(index, flashVideo){
     
     // set the document (tab) title from the current video time 
     // a bit dodgy if there is more than one video...
-//	window.setIntervalId = window.setInterval(1000, function() {
-//		document.title = Math.floor(flashVideo.getCurrentTime()) + " second(s)";
-//	});
+	//	window.setIntervalId = window.setInterval(1000, function() {
+	//		document.title = Math.floor(flashVideo.getCurrentTime()) + " second(s)";
+	//	});
 
 });
 
@@ -70,6 +91,7 @@ function handleVisibilityChange() {
 			videoElement.pause();
 		});
 		flashVideos.each(function(index, flashVideo){
+			console.log("in handleVisibilityChange");
 			flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
 			flashVideo.pauseVideo();
 		});
