@@ -81,8 +81,8 @@ flashVideos.each(function(index, flashVideo)
 
 function handleVisibilityChange() {
 	// if the page is now hidden
-	// get the current play state of videos
-	// and pause them
+	// get the current play state of videos (for when the user 
+	// returns to this page) and pause videos
 	if (document.webkitHidden) {
 		htmlVideos.each(function(index, videoElement){
 			videoElement.wasPlaying = !videoElement.paused;
@@ -92,11 +92,12 @@ function handleVisibilityChange() {
 			// yuk! see note above
 			var intervalId = setInterval(function(){
 				if (flashVideo.getPlayerState) {
+					console.log("setting wasPlaying");
 					flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
 					flashVideo.pauseVideo();
 					clearInterval(intervalId);
 				}
-			});        
+			},10);        
 		});
 	// if the page is now displayed, 
 	// play videos that were playing before the page was hidden
