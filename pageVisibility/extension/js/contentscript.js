@@ -28,8 +28,7 @@ function addEventListeners(videoElement){
 
 // set event listeners for html video elements
 var htmlVideos = $("video");
-htmlVideos.each(function(index, videoElement)
-{
+htmlVideos.each(function(index, videoElement) {
 	if (document.webkitVisibilityState === "hidden") {
 		videoElement.pause();
 	}	
@@ -49,8 +48,7 @@ document.addEventListener('DOMNodeInserted', function(event) {
 
 // set event listeners for flash videos
 var flashVideos = $("embed[type='application/x-shockwave-flash']");
-flashVideos.each(function(index, flashVideo)
-{	
+flashVideos.each(function(index, flashVideo){	
 	if (document.webkitVisibilityState === "hidden") {
 		// this is nasty, but it works and I can't think of a better way :(
 		// if you have a better idea, please email me at samdutton@gmail.com!
@@ -150,16 +148,16 @@ if (typeof document.webkitHidden === "undefined") {
 
 
 
-chrome.extension.onRequest.addListener(
-	function(request, sender, sendResponse) {
-		var response = {};
-//		console.log("request.type: " + request.type);
-		if (request.type === "foo") {
-		} else if (request.type == "bar") {
-		} else {
-			console.log("Unknown request type: " + request.type);
-		}
-//		sendResponse(response); // otherwise request remains open 
-	}
-);
+// chrome.extension.onRequest.addListener(
+	// function(request, sender, sendResponse) {
+		// var response = {};
+		console.log("request.type: " + request.type);
+		// if (request.type === "foo") {
+		// } else if (request.type === "bar") {
+		// } else {
+			// console.log("Unknown request type: " + request.type);
+		// }
+		sendResponse(response); // otherwise request remains open 
+	// }
+// );
 
