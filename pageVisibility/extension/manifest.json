@@ -1,12 +1,12 @@
 {
 	"name" : "Hold It!",
 	"version" : "1.0",
-	"description" : "Pause video when it's not visible. Useful when you move tabs or open a video link in a new tab.",
+	"description" : "Automatically pause video when it's not visible: useful when viewing videos in multiple tab pages.",
 	"background_page" : "background.html",
 	"browser_action" : {
 		"default_icon" : "images/22.png",
 		"popup" : "popup.html",
-		"default_title" : ""
+		"default_title" : "Automatically pause video when it's not visible"
 	},
 	"content_scripts" : [
 		{

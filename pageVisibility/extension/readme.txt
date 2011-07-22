@@ -25,7 +25,7 @@ The API can be used to check when a web page is visible to the user or not.
 
 If you minimise your browser window, or move to another tab, JavaScript detects a webkitvisibilitychange event. 
 
-When a new page loads, the extension looks for videos on the page -- including Flash video and HTML video elements. If the page is not visible, or becomes hidden, all playing videos on the page are paused. Play restarts (for videos that were playing) once they become visible again. 
+When a new page loads, the extension looks for videos on the page -- including HTML video, and Flash videos on sites like YouTube and Vimeo. If the page is not visible, or becomes hidden, all playing videos on the page are paused. Play restarts (for videos that were playing) once they become visible again. 
 
 
 Feedback

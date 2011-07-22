@@ -1,10 +1,33 @@
-// revert to existing favicon when the page is closed
+
+
+// callback to revert to pre-existing favicon when the page is closed
 // otherwise the favicon will remain as paused.png or play.png
 function resetFavicon() {
 	favicon.change(location.protocol + "//" + location.host + "/favicon.ico");
 }
 
-function addEventListeners(videoElement){
+// warn if the browser doesn't support document.webkitHidden
+if (typeof document.webkitHidden === "undefined") {
+	alert("This demo requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
+} else {
+    // handle page visibility change
+    // see https://developer.mozilla.org/en/API/PageVisibility/Page_Visibility_API
+    document.addEventListener("webkitvisibilitychange",  handleVisibilityChange, false);
+    
+	// reset favicon when page is closed
+    window.addEventListener("unload", function(){
+    	resetFavicon();
+	}, false);    
+}
+
+function setHtmlPlayState(videoElement){
+	if (document.webkitVisibilityState === "hidden") {
+		videoElement.pause();
+	}	
+}
+
+// add event listeners for HTML video elements
+function addHtmlEventListeners(videoElement){
 	// when the video pauses, set the favicon
     videoElement.addEventListener("pause", function(){
         favicon.change(chrome.extension.getURL("images/paused.png"));
@@ -29,41 +52,33 @@ function addEventListeners(videoElement){
 // set event listeners for html video elements
 var htmlVideos = $("video");
 htmlVideos.each(function(index, videoElement) {
-	if (document.webkitVisibilityState === "hidden") {
-		videoElement.pause();
-	}	
-	addEventListeners(videoElement);
+	setHtmlPlayState(videoElement);
+	addHtmlEventListeners(videoElement);
 });
 
-// in case a video element is added dynamically, e.g. on Vimeo
-document.addEventListener('DOMNodeInserted', function(event) {
-    if (event.target.nodeName === "VIDEO") { 
-		// console.log('inserted ' + event.target.nodeName + // new node
-			// ' in ' + event.relatedNode.nodeName); // parent
-		// console.log(event.target);
-        htmlVideos.push(event.target); // event.target is a video element
-		addEventListeners(event.target);
-    }
-});
-
-// set event listeners for flash videos
-var flashVideos = $("embed[type='application/x-shockwave-flash']");
-flashVideos.each(function(index, flashVideo){	
+function setFlashPlayState(flashVideo){
 	if (document.webkitVisibilityState === "hidden") {
-		// this is nasty, but it works and I can't think of a better way :(
-		// if you have a better idea, please email me at samdutton@gmail.com!
-		var intervalId = setInterval(function(){
-			if (flashVideo.getPlayerState) {
-				flashVideo.wasPlaying = flashVideo.getPlayerState() === 1; // playing
-				flashVideo.pauseVideo();
-				console.log("paused");
-				clearInterval(intervalId);
+		// ugly, but don't know a better way
+		// if you have a better solution, please email me at samdutton@gmail.com!
+		var intervalId = setInterval(function(){ // YouTube
+			if (flashVideo.pauseVideo) {
+				var playerState = flashVideo.getPlayerState();
+				if (playerState != -1 && playerState != 3) { // unstarted or buffering
+					flashVideo.wasPlaying = playerState === 1;
+					flashVideo.pauseVideo();
+					clearInterval(intervalId);
+				}
 			}
 		});
 	}
-	
-	// when the video pauses, set the favicon
-    flashVideo.addEventListener("onStateChange", function(newState){
+}
+
+// when the video pauses, set the favicon, and vice versa
+// this doesn't work -- not sure why...
+/* 
+function addFlashEventListeners(flashVideo){
+	// YouTube
+	flashVideo.addEventListener("onStateChange", function(newState){ 
 		switch(newState) {
 		// when the video ends, reset the favicon
 		case 0: // ended
@@ -79,15 +94,44 @@ flashVideos.each(function(index, flashVideo){
 			break;
 		}
 	}, false);
-    
-    // set the document (tab) title from the current video time 
-    // a bit dodgy if there is more than one video...
-	//	window.setIntervalId = window.setInterval(1000, function() {
-	//		document.title = Math.floor(flashVideo.getCurrentTime()) + " second(s)";
-	//	});
+	
+	// Vimeo
+	flashVideo.addEventListener("pause", function(){
+		favicon.change(chrome.extension.getURL("images/paused.png"));
+	}, false);	
+	flashVideo.addEventListener("play", function(){
+		favicon.change(chrome.extension.getURL("images/playing.png"));
+	}, false);
+	flashVideo.addEventListener("finish", function(){
+		resetFavicon();
+	}, false);	
+}
 
+ */
+
+var flashVideos = $("embed[type='application/x-shockwave-flash']"); // YouTube
+// set event listeners for flash videos
+flashVideos.each(function(index, flashVideo){	
+	setFlashPlayState(flashVideo);
+//	addFlashEventListeners(flashVideo); // can't get this to work, not sure why
 });
 
+// in case a video element is added dynamically, e.g. on Vimeo
+document.addEventListener('DOMNodeInserted', function(event) {
+	var element = event.target;
+    if (element.nodeName === "VIDEO") { 
+        htmlVideos.push(element); // event.target is a video element
+        setHtmlPlayState(element);
+		addHtmlEventListeners(element);
+    } else if (element.type === "application/x-shockwave-flash") { // e.g. Vimeo
+    	setFlashPlayState(element);
+//    	addFlashEventListeners(element); // doesn't work, not sure why 
+		flashVideos.push(element); // event.target is a video element
+    }
+});
+
+// pause/play videos depending on their previous state and 
+// whether or not the page is now hidden
 function handleVisibilityChange() {
 	// if the page is now hidden
 	// get the current play state of videos (for when the user 
@@ -97,17 +141,17 @@ function handleVisibilityChange() {
 			videoElement.wasPlaying = !videoElement.paused;
 			videoElement.pause();
 		});
+		
 		flashVideos.each(function(index, flashVideo){
-			// yuk! see note above
-			var intervalId = setInterval(function(){
-				if (flashVideo.getPlayerState) {
-					console.log("got player state");
-					flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
-					flashVideo.pauseVideo();
-					clearInterval(intervalId);
-				}
-			},100);        
+			if (flashVideo.pauseVideo) { // YouTube
+				flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
+				flashVideo.pauseVideo();
+			} else if (flashVideo.api_pause){ // Vimeo
+				flashVideo.wasPlaying = !flashVideo.paused;
+				flashVideo.api_pause();
+			}
 		});
+		
 	// if the page is now displayed, 
 	// play videos that were playing before the page was hidden
 	} else {
@@ -117,47 +161,14 @@ function handleVisibilityChange() {
 			}
 		});
 		flashVideos.each(function(index, flashVideo){
-			// yuk! see note above
-			var intervalId = setInterval(function(){
-				if (flashVideo.getPlayerState) {
-					if (flashVideo.wasPlaying === true) {
-							flashVideo.playVideo();
-					}
-					clearInterval(intervalId);
+			if (flashVideo.wasPlaying === true) {
+				if (flashVideo.playVideo) { // YouTube
+					flashVideo.playVideo();
+				} else if (flashVideo.api_play) { // Vimeo
+					flashVideo.api_play();
 				}
-			});        
+			}
 		});
 	}
 }
-
-
-// warn if the browser doesn't support document.webkitHidden
-if (typeof document.webkitHidden === "undefined") {
-	alert("This demo requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
-} else {
-    // handle page visibility change
-    // see https://developer.mozilla.org/en/API/PageVisibility/Page_Visibility_API
-    document.addEventListener("webkitvisibilitychange",  handleVisibilityChange, false);
-    
-	// reset favicon when page is closed
-    window.addEventListener("unload", function(){
-    	resetFavicon();
-	}, false);    
-}
-
-
-
-
-// chrome.extension.onRequest.addListener(
-	// function(request, sender, sendResponse) {
-		// var response = {};
-//		console.log("request.type: " + request.type);
-		// if (request.type === "foo") {
-		// } else if (request.type === "bar") {
-		// } else {
-			// console.log("Unknown request type: " + request.type);
-		// }
-//		sendResponse(response); // otherwise request remains open 
-	// }
-// );
 

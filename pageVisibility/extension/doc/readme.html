@@ -6,7 +6,7 @@
 
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 
-<title>The Framegrabber Chrome extension</title>
+<title>Hold It! extension</title>
 
 <style type="text/css">
 a {
@@ -98,26 +98,32 @@ $(document).ready(function() {
 
 <div id="container">
 
-<h1>Navigation Timing extension</h1>
+<h1>Hold It! extension</h1>
 
-<p>Display page load timing and navigation data using the JavaScript <em>window.performance</em> API.</p>
+<p>Automatically pause video that's not visible.</p>
 
+<p>For example, when you:</p>
+<ul>
+	<li>minimise a window with a video playing in it</li>
+	<li>move to a different tab</li>
+	<li>open a video link in a different tab.</li>
+</ul>
+
+<p>Useful when viewing videos on multiple tab pages, or if you click a link to open a video in a new, hidden tab.</p>
 
 <h2>How to use the extension</h2>
 
-<p>This extension will work on any web page that supports content scripts.</p>
+<p>After installing the extension, any playing video will be paused when you move to a different tab or minimise a window. If you click on a link to open a video in a new, hidden tab, the video will be paused until you move to the new tab.</p>
 
-<p>Install the extension and then click on the extension icon to view a visualisation of page load timing and navigation data.</p>
+<h2>How does it work?</h2>
 
-<p>This extension will not work on pages that do not support content scripts, such as those with a chrome: URL.</p>
+<p>This extension uses the <a href="http://code.google.com/chrome/whitepapers/pagevisibility.html" title="Using the Page Visibility Api">Page Visibility API</a>.</p>
 
+<p>The API can be used to check when a web page is visible to the user or not.</p>
 
-<h2>How does it work?</h2> 
+<p>If you minimise your browser window, or move to another tab, the API fires a webkitvisibilitychange event.</p>
 
-<p>This extension uses the <em>timing</em> and <em>navigation</em> properties of the <em>window.performance</em> object.</p>
-
-<p>For more information, see the W3C Navigation Timing <a href="https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html">Editor's Draft.</a></p>
-
+<p>When a new page loads, the extension looks for videos on the page -- including Flash video and HTML video elements. If the page is not visible, or becomes hidden, all playing videos on the page are paused. Play restarts (for videos that were playing) once they become visible again.</p> 
 
 <h2 id="feedback">Feedback</h2>
 
