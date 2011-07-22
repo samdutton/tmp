@@ -8,7 +8,7 @@ function resetFavicon() {
 
 // warn if the browser doesn't support document.webkitHidden
 if (typeof document.webkitHidden === "undefined") {
-	alert("This demo requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
+	console.log("The Hold It! extension requires a browser such as Google Chrome 13 that supports the Page Visibility API.");
 } else {
     // handle page visibility change
     // see https://developer.mozilla.org/en/API/PageVisibility/Page_Visibility_API
