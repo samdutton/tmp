@@ -4,15 +4,7 @@ function resetFavicon() {
 	favicon.change(location.protocol + "//" + location.host + "/favicon.ico");
 }
 
-
-// set event listeners for html video elements
-var htmlVideos = $("video");
-htmlVideos.each(function(index, videoElement)
-{
-	if (document.webkitVisibilityState === "hidden") {
-		videoElement.pause();
-	}
-	
+function addEventListeners(videoElement){
 	// when the video pauses, set the favicon
     videoElement.addEventListener("pause", function(){
         favicon.change(chrome.extension.getURL("images/paused.png"));
@@ -32,7 +24,27 @@ htmlVideos.each(function(index, videoElement)
     videoElement.addEventListener("timeupdate", function(){
 		document.title = Math.floor(videoElement.currentTime) + " second(s)";
 	}, false);
+}
 
+// set event listeners for html video elements
+var htmlVideos = $("video");
+htmlVideos.each(function(index, videoElement)
+{
+	if (document.webkitVisibilityState === "hidden") {
+		videoElement.pause();
+	}	
+	addEventListeners(videoElement);
+});
+
+// in case a video element is added dynamically, e.g. on Vimeo
+document.addEventListener('DOMNodeInserted', function(event) {
+    if (event.target.nodeName === "VIDEO") { 
+		// console.log('inserted ' + event.target.nodeName + // new node
+			// ' in ' + event.relatedNode.nodeName); // parent
+		// console.log(event.target);
+        htmlVideos.push(event.target); // event.target is a video element
+		addEventListeners(event.target);
+    }
 });
 
 // set event listeners for flash videos
@@ -78,7 +90,6 @@ flashVideos.each(function(index, flashVideo)
 
 });
 
-
 function handleVisibilityChange() {
 	// if the page is now hidden
 	// get the current play state of videos (for when the user 
@@ -92,12 +103,12 @@ function handleVisibilityChange() {
 			// yuk! see note above
 			var intervalId = setInterval(function(){
 				if (flashVideo.getPlayerState) {
-					console.log("setting wasPlaying");
+					console.log("got player state");
 					flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
 					flashVideo.pauseVideo();
 					clearInterval(intervalId);
 				}
-			},10);        
+			},100);        
 		});
 	// if the page is now displayed, 
 	// play videos that were playing before the page was hidden
