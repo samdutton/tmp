@@ -151,13 +151,13 @@ if (typeof document.webkitHidden === "undefined") {
 // chrome.extension.onRequest.addListener(
 	// function(request, sender, sendResponse) {
 		// var response = {};
-		console.log("request.type: " + request.type);
+//		console.log("request.type: " + request.type);
 		// if (request.type === "foo") {
 		// } else if (request.type === "bar") {
 		// } else {
 			// console.log("Unknown request type: " + request.type);
 		// }
-		sendResponse(response); // otherwise request remains open 
+//		sendResponse(response); // otherwise request remains open 
 	// }
 // );
 
