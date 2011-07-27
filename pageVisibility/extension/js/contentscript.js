@@ -112,6 +112,7 @@ function addFlashEventListeners(flashVideo){
 var flashVideos = $("embed[type='application/x-shockwave-flash']"); // YouTube
 // set event listeners for flash videos
 flashVideos.each(function(index, flashVideo){	
+	console.log("flashVideo.src: " + flashVideo.src);
 	setFlashPlayState(flashVideo);
 //	addFlashEventListeners(flashVideo); // can't get this to work, not sure why
 });
@@ -146,6 +147,7 @@ function handleVisibilityChange() {
 			if (flashVideo.pauseVideo) { // YouTube
 				flashVideo.wasPlaying = flashVideo.getPlayerState() === 1;
 				flashVideo.pauseVideo();
+				console.log("player state: " + flashVideo.getPlayerState());
 			} else if (flashVideo.api_pause){ // Vimeo
 				flashVideo.wasPlaying = !flashVideo.paused;
 				flashVideo.api_pause();

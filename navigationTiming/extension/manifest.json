@@ -16,7 +16,7 @@
 			],
 	
 		"css" : ["css/injected.css"],
-		"js" : ["js/jquery-1.6.1.js", "js/jquery.url.js", "js/contentscript.js"],
+		"js" : ["js/jquery-1.6.1.js", "js/jquery.url.js", "js/lawnchair.js", "js/contentscript.js"],
 		"run_at" : "document_end",
 		"all_frames" : false
 		}
