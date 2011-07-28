@@ -1,25 +1,16 @@
 {
 	"name" : "Hold It!",
-	"version" : "1.2.1",
-	"description" : "Automatically pause video when it's not visible: useful when viewing videos in multiple tab pages.",
+	"version" : "1.2.2",
+	"description" : "Automatically pause video when it's not visible. Great for viewing videos in multiple tab pages!",
 	"minimum_chrome_version": "13",
-	"background_page" : "background.html",
-	"browser_action" : {
-		"default_icon" : "images/22.png",
-		"popup" : "popup.html",
-		"default_title" : "Automatically pause video when it's not visible"
-	},
 	"content_scripts" : [
 		{
 			"matches" : [
 				"http://*/*",
 				"https://*/*"
 			],
-	
-		"css" : ["css/injected.css"],
-		"js" : ["js/jquery-1.6.1.js", "js/contentscript.js", "js/favicon.js"],
-		"run_at" : "document_end",
-		"all_frames" : false
+			"js" : ["js/jquery-1.6.1.js", "js/contentscript.js", "js/favicon.js"],
+			"run_at" : "document_end"
 		}
 	],
 	"icons" : {
@@ -28,8 +19,5 @@
 		"32" : "images/32.png",
 		"48" : "images/48.png",
 		"128" : "images/128.png"
-	},
-	"permissions": [
-        "tabs"
-	]
-  }
+	}
+}
