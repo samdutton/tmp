@@ -1,7 +1,8 @@
 var tabId, tabUrl;
 
-$(document).ready( function() 
-{
+// Draw the timeline and historical data chart.
+// This is the callback to Google Charts setOnLoadCallback in popup.html
+function drawCharts(performanceData) {	
 	// get the current tab
 	chrome.tabs.getSelected(null, function(tab) {
 		tabId = tab.id;
@@ -15,14 +16,50 @@ $(document).ready( function()
 		// -- for these pages, popup.html has div#dataNotAvailable 
 		chrome.tabs.sendRequest(tabId, {"type": "sendPerformance"}, 
 			// contentscript sends array of data saved by Lawnchair
-			function(data){ 
+			function(performanceData){ 
 				// display the most recent performance data
-				writeCurrentPerformance(data[data.length - 1]);
+				writeCurrentPerformance(performanceData[performanceData.length - 1]);
 				// display a chart of historical data for the current page
-				writeHistoricalPerformance(data);
+				drawHistoricalChart(performanceData);
 			});	
-	});		
-});
+	});			
+}		
+
+// Display a chart of historical data for the current page
+// -- performanceData is the array of objects saved by Lawnchair.
+// Each object has window.performance attributes (memory, navigation, timing)
+// plus a key added by Lawnchair.
+function drawHistoricalChart(performanceData){
+	var data = new google.visualization.DataTable();
+	data.addColumn('string', 'Date');
+	data.addColumn('number', 'Network latency');
+	data.addColumn('number', 'Page load');
+	data.addColumn('number', 'Total');
+	data.addRows(performanceData.length);	
+	console.log(performanceData);
+	performanceData.forEach(function(element, index, array) {
+		var timing = element.timing;
+		var date = new Date(timing.navigationStart);
+		var dateTimeLabel = 
+			date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + 
+				" " + date.toLocaleTimeString();
+				
+		// to cope when page hasn't yet loaded -- not sure why this happens
+ 		if (timing.loadEventEnd !== 0) {
+			var networkLatency = timing.responseEnd - timing.fetchStart;	
+			var pageLoad = timing.loadEventEnd - timing.responseEnd;	
+			var soupToNuts = timing.loadEventEnd - timing.navigationStart;
+			data.setValue(index, 0, dateTimeLabel);
+			data.setValue(index, 1, networkLatency);
+			data.setValue(index, 2, pageLoad);
+			data.setValue(index, 3, soupToNuts);
+		}			
+	});
+	
+	var chartElement = document.getElementById('historicalChart');
+	var chart = new google.visualization.LineChart(chartElement);
+	chart.draw(data, {width: 740, height: 500, title: 'Navigation and load time (ms)'});
+}
 
 
 // Timeline class used for div#timeline chart.
@@ -240,10 +277,3 @@ function writeCurrentPerformance(performance)
 	}
 }
 
-// Display a chart of historical data for the current page
-// data is the array of objects saved by Lawnchair.
-// Each object has window.performance attributes (memory, navigation, timing)
-// plus a key added by Lawnchair.
-function writeHistoricalPerformance(data) {
-	alert(data);
-}
