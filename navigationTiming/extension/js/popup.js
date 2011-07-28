@@ -6,15 +6,20 @@ $(document).ready( function()
 	chrome.tabs.getSelected(null, function(tab) {
 		tabId = tab.id;
 		tabUrl = tab.url;
-		// request the window.performance object from the contentscript
-		// write a timeline and other dynamic elements when the response is received
+		// request window.performance data from the contentscript, then:
+		// - display a timeline and other information for the most recent data
+		// - display a chart of historical data
 		// note that this request will only be processed if the current page
 		// is of a type that can accept a content script, 
 		// i.e not pages such as chrome://extensions
 		// -- for these pages, popup.html has div#dataNotAvailable 
 		chrome.tabs.sendRequest(tabId, {"type": "sendPerformance"}, 
-			function(response){
-				writeDynamicElements(response);
+			// contentscript sends array of data saved by Lawnchair
+			function(data){ 
+				// display the most recent performance data
+				writeCurrentPerformance(data[data.length - 1]);
+				// display a chart of historical data for the current page
+				writeHistoricalPerformance(data);
 			});	
 	});		
 });
@@ -212,7 +217,7 @@ function writeTimeline(timelineElement, timing)
 // be called for pages that support content scripts. 
 // For pages such as those with chrome: URLs, which do not support content
 // scripts, div#dataNotAvailable is displayed in popup.html.
-function writeDynamicElements(performance)
+function writeCurrentPerformance(performance)
 { 
 	$("div#dataNotAvailable").hide();
 
@@ -233,4 +238,12 @@ function writeDynamicElements(performance)
 		var howIGotHere = navigationTypes[performance.navigation.type];
 		$("#howIGotHere").html(howIGotHere);    
 	}
+}
+
+// Display a chart of historical data for the current page
+// data is the array of objects saved by Lawnchair.
+// Each object has window.performance attributes (memory, navigation, timing)
+// plus a key added by Lawnchair.
+function writeHistoricalPerformance(data) {
+	alert(data);
 }
