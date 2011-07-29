@@ -1,12 +1,12 @@
 {
-	"name" : "Navigation Timing",
-	"version" : "1.1",
-	"description" : "Display a timeline of navigation and page load events for the current page.",
+	"name" : "Page speed test",
+	"version" : "1.2",
+	"description" : "Get accurate, detailed navigation and page-load timing data -- for any page.",
 	"background_page" : "background.html",
 	"browser_action" : {
 		"default_icon" : "images/22.png",
 		"popup" : "popup.html",
-		"default_title" : "Click to view a timeline of navigation and page load events for the current page"
+		"default_title" : "Click to view navigation and page load timing charts for the current page"
 	},
 	"content_scripts" : [
 		{

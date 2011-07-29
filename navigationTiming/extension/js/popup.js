@@ -36,7 +36,6 @@ function drawHistoricalChart(performanceData){
 	data.addColumn('number', 'Page load');
 	data.addColumn('number', 'Total');
 	data.addRows(performanceData.length);	
-	console.log(performanceData);
 	performanceData.forEach(function(element, index, array) {
 		var timing = element.timing;
 		var date = new Date(timing.navigationStart);

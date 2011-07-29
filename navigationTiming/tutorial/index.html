@@ -223,7 +223,9 @@ function writeDynamicElements(){
     writeTimeline();
 }
 
-var isWindowPerformanceSupported = !(typeof performance.timing === "undefined");
+var isWindowPerformanceSupported = 
+	typeof(performance) !== "undefined" &&
+		typeof(performance.timing) !== "undefined";
 
 $(document).ready(function(){
     if (isWindowPerformanceSupported) {
@@ -273,9 +275,9 @@ if (!isWindowPerformanceSupported) {
 }
 </script>
 
-<p>People like web pages that load quickly. Google <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">experiments</a> show that delays as small as a hundred milliseconds can have an adverse effect &ndash; and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, "basic advice regarding response times has been about the same for thirty years".</p>
+<p>People like web pages that load quickly. Google <a href="http://googleresearch.blogspot.com/2009/06/speed-matters.html" title="Google Official Research Blog: Speed Matters" target="_blank">experiments</a> show that a delay as small as a hundred milliseconds can have an adverse effect &ndash; and as Jakob Nielsen <a href="http://www.useit.com/papers/responsetime.html" title="Jakob Nielsen: Response Times: The 3 Important Limits" target="_blank">pointed out</a> back in 1993, "basic advice regarding response times has been about the same for thirty years".</p>
 
-<p>But now do we measure web page load speed? And what does "page load" actually mean?</p>
+<p>But how do we measure web page load speed? And what does "page load" actually mean?</p>
 
 <p>The Navigation Timing API provides a simple way to get accurate and detailed timing statistics &ndash; natively &ndash; for page navigation and loading.  It's available now in <a href="http://msdn.microsoft.com/en-us/library/ff975118(v=VS.85).aspx" title="MSDN performance Object documentation" target="_blank">Internet Explorer 9</a> and <a href="http://www.google.com/chrome" title="Google Chrome home page">Google Chrome</a> version 6 and above. A <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=570341" title="Mozilla bug report" target="_blank">Firefox implementation</a> has been completed and is expected to be incorporated in version 6.</p>
 
